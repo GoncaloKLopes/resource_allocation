@@ -41,10 +41,10 @@
 	 * turno -- o turno cuja duração deve ser calculada.
 	 Retorno:
 	 * A duração do turno."
-
-	(if (eq 1 (length turno))
-		(duracao-tarefa (car turno))
-		(+ (duracao-tarefa (car turno)) (duracao-turno (cdr turno)))))
+	(let ((duracao (duracao-tarefa (car turno))))
+		(if (eq 1 (length turno))
+			duracao)
+			(+ duracao (cdr turno))))
 
 (defun tarefas-sobrepostas-p (tarefa1 tarefa2)
 
