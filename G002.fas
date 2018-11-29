@@ -35,7 +35,7 @@
      '|COMMON-LISP-USER|::|PAUSA|)
     |SYSTEM|::|CONSTANT-WARNING|)
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|10 36 (DEFUN CAR-TURNO (TURNO) ...)-6|
+#Y(#:|9 25 (DEFUN CAR-TURNO (TURNO) ...)-6|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|CAR-TURNO| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|CAR-TURNO|
@@ -50,5 +50,54 @@
 	 * turno -- o turno ao qual o primeiro elemento deve ser extraido.\n
 	 Retorno:\n
 	 * O primeiro turno da lista"
+       1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|27 35 (DEFUN DURACAO-TAREFA (TAREFA) ...)-7|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|DURACAO-TAREFA| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|DURACAO-TAREFA|
+       #26Y(00 00 00 00 01 00 00 00 26 02 9E 5C 5C 5C 78 9F 5C 5C 78 72 B2 33
+            01 38 19 02)
+       () (|COMMON-LISP|::|T| |COMMON-LISP|::|NIL| |COMMON-LISP|::|NIL|)
+       (|COMMON-LISP-USER|::|TAREFA|)
+       "Calcula a duração de uma tarefa.\n
+	 Argumentos:\n
+	 * tarefa -- a tarefa cuja duração deve ser calculada.\n
+	 Retorno:\n
+	 * A duração da tarefa."
+       1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|37 47 (DEFUN DURACAO-TURNO (TURNO) ...)-8|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|DURACAO-TURNO| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|DURACAO-TURNO|
+       #35Y(00 00 00 00 01 00 00 00 26 02 AD 72 62 24 00 0D 94 01 6F 01 95 02
+            6C 72 33 02 37 19 02 94 01 2F 01 19 02)
+       (1. |COMMON-LISP-USER|::|DURACAO-TAREFA|)
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
+       (|COMMON-LISP-USER|::|TURNO|)
+       "Calcula a duração de um turno.\n
+	 Argumentos:\n
+	 * turno -- o turno cuja duração deve ser calculada.\n
+	 Retorno:\n
+	 * A duração do turno."
+       1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|49 60 (DEFUN TAREFAS-SOBREPOSTAS-P (TAREFA1 TAREFA2) ...)-9|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|TAREFAS-SOBREPOSTAS-P|
+    |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|TAREFAS-SOBREPOSTAS-P|
+       #40Y(00 00 00 00 02 00 00 00 26 03 94 01 C5 5A 59 1F 15 94 02 C5 5A 59
+            1F 0E 9E 5C 5C 78 A0 5C 5C 5C 78 33 01 31 19 03 19 03)
+       (#.|COMMON-LISP-USER|::|CARACTER_PAUSA|)
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|NIL| |COMMON-LISP|::|NIL|)
+       (|COMMON-LISP-USER|::|TAREFA1| |COMMON-LISP-USER|::|TAREFA2|)
+       "Predicado que verifica se duas tarefas se sobrepoem.\n
+	 Argumentos:\n
+	 * tarefa1 -- a primeira tarefa a ser verificada.\n
+	 * tarefa2 -- a segunda tarefa a ser verificada.\n
+	 Retorno:\n
+	 * T se se sobrepuserem, NIL caso contrário."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))

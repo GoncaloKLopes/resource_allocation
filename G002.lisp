@@ -6,26 +6,15 @@
 (defconstant DURACAO_ANTES_REFEICAO 240)
 (defconstant CARACTER_PAUSA 'PAUSA)
 
-
-;(defstruct tarefa
-;	local_partida
-;	local_chegada
-;	instante_partida
-;	instante_chegada)
-
-;(defstruct problema)
-
-;(defun rep-externa (tarefa)
-;	(list (tarefa-local_partida tarefa-local_chegada tarefa-instante_partida tarefa-instante_chegada)))
-
-
 (defun car-turno (turno)
+	
 	"Função car modificada para extrair o primeiro elemento
 	 que não seja o caracter da pausa CARACTER_PAUSA.
 	 Argumentos:
 	 * turno -- o turno ao qual o primeiro elemento deve ser extraido.
 	 Retorno:
 	 * O primeiro turno da lista"
+
 	(let ((resultado (car turno))
 		  (resto (cdr turno)))
 		 (loop
@@ -35,22 +24,37 @@
 		 			(setf resto (cdr resto)))
 				(return resultado)))))
 
-;(defun viola-restricoes-p (turno)
-;	(let ((tarefa_inicial (car turno)))
-;		(flet ((tarefas-sobrepostas-p (turno)
-;					(let ((curr_partida (tarefa-instante_partida (car-turno turno)))
-;						  (curr_chegada (tarefa-instante_partida (car-turno turno)))
-;						 (dolist (curr_turno (cdr turno))
-;						 	(if (< (tarefa-instante_partida curr_turno) curr_chegada)
-;						 		(return-from T)))
-;						  NIL))))
-;	(if (or (> (duracao-turno (turno)) DURACAO_MAX_TURNO)
-;			())))))
+(defun duracao-tarefa (tarefa)
 
+	"Calcula a duração de uma tarefa.
+	 Argumentos:
+	 * tarefa -- a tarefa cuja duração deve ser calculada.
+	 Retorno:
+	 * A duração da tarefa."
 
-;(defun custo-turno (turno))
+	(- (nth 3 tarefa) (1- (nth 2 tarefa))))
 
-;(defun faz-afectacao (problema estrategia))
+(defun duracao-turno (turno)
 
+	"Calcula a duração de um turno.
+	 Argumentos:
+	 * turno -- o turno cuja duração deve ser calculada.
+	 Retorno:
+	 * A duração do turno."
 
-;((L1 L3 1 5) (BREAK) (L3 L1 7 9) (L1 L6 8 11))
+	(if (eq 1 (length turno))
+		(duracao-tarefa (car turno))
+		(+ (duracao-tarefa (car turno)) (duracao-turno (cdr turno)))))
+
+(defun tarefas-sobrepostas-p (tarefa1 tarefa2)
+
+	"Predicado que verifica se duas tarefas se sobrepoem.
+	 Argumentos:
+	 * tarefa1 -- a primeira tarefa a ser verificada.
+	 * tarefa2 -- a segunda tarefa a ser verificada.
+	 Retorno:
+	 * T se se sobrepuserem, NIL caso contrário."
+
+	(and (not (eq (car tarefa2) CARACTER_PAUSA))
+		 (not (eq (car tarefa1) CARACTER_PAUSA))
+		 (< (nth 2 tarefa2) (nth 3 tarefa1))))
