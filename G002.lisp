@@ -162,6 +162,29 @@
 					turno-resultado))
 			NIL)))
 
+(defun le-problema (problema)
+
+	"Le um problema na sua representação externa e transforma-o para a sua
+	 representação interna, transformando cada tarefa num turno e introduzindo
+	 as pausas necessárias no inicio e fim do turno.
+	 Argumentos:
+	 * problema -- lista de tarefas correspondente à 
+	               representação externa de um problema a resolver.
+	 Retorno:
+	 * Lista de turnos correspondente ao estado inicial de um problema."
+	
+	(let ((estado-resultado '())
+		  (turno-aux '()))
+		(dolist (tarefa problema)
+			(if (not (eq (car tarefa) 'L1))
+				(setf turno-aux (append turno-aux (turno-pausa))))
+			(setf turno-aux (append turno-aux (list tarefa)))
+			(if (not (eq (nth 1 tarefa) 'L1))
+				(setf turno-aux (append turno-aux (turno-pausa))))
+			(setf estado-resultado (append estado-resultado (list turno-aux)))
+			(setf turno-aux '()))
+		estado-resultado))
+
 (defun gera-sucessores (estado)
 	estado
 	"Gera a lista de sucessores dado um estado.
