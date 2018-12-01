@@ -51,7 +51,38 @@
 	 * O primeiro turno da lista"
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|27 35 (DEFUN TAREFA-PAUSA-P (TAREFA) ...)-7|
+#Y(#:|27 36 (DEFUN LAST-TURNO (TURNO) ...)-7|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|LAST-TURNO| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|LAST-TURNO|
+       #17Y(00 00 00 00 01 00 00 00 26 02 AD 72 63 2F 00 19 02)
+       (|COMMON-LISP-USER|::|CAR-TURNO|)
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
+       (|COMMON-LISP-USER|::|TURNO|)
+       "Função last modificada para extrair o ultimo elemento\n
+	 que não seja o caracter da pausa CARACTER_PAUSA.\n
+	 Argumentos:\n
+	 * turno -- Lista de tarefas.\n
+	 Retorno:\n
+	 * O ultimo turno da lista"
+       1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|38 47 (DEFUN LAST-TAREFA (TURNO) ...)-8|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|LAST-TAREFA| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|LAST-TAREFA|
+       #18Y(00 00 00 00 01 00 00 00 26 02 AD 38 01 31 A9 5B 19 02) ()
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|NIL| |COMMON-LISP|::|NIL|)
+       (|COMMON-LISP-USER|::|TURNO|)
+       "Função last modificada para devolver apenas a tarefa, \n
+	 em vez de uma lista com uma tarefa.\n
+	 Argumentos:\n
+	 * turno -- o turno do qual será obtida a última tarefa.\n
+	 Retorno:\n
+	 * Uma lista de 4 elementos, correspondente a uma tarefa."
+       1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|49 57 (DEFUN TAREFA-PAUSA-P (TAREFA) ...)-9|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|TAREFA-PAUSA-P| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|TAREFA-PAUSA-P|
@@ -66,14 +97,20 @@
 	 * T se for corresponder a uma tarefa de pausa, NIL caso contrário."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|37 50 (DEFUN DURACAO-TAREFA (TAREFA &KEY #) ...)-8|
+#Y(#:|59 72 (DEFUN DURACAO-TAREFA (TAREFA &KEY #) ...)-10|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|DURACAO-TAREFA| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|DURACAO-TAREFA|
-       #46Y(00 00 00 00 01 00 00 00 A6 1C 01 00 00 00 3B 01 02 7E 01 AE 88 01
-            11 9F 5C 5C 5C 78 A0 5C 5C 78 33 01 38 19 03 C7 19 03 92 01 7A C8
-            19 03)
-       (:|CONTABILIZA-PAUSAS?| |COMMON-LISP-USER|::|TAREFA-PAUSA-P|
+       #53Y(00 00 00 00 01 00 00 00 A6 1C 01 00 00 00 3B 01 02 7E 01 DB 6B 02
+            B0 33 02 15 AE 88 03 11 9F 5C 5C 5C 78 A0 5C 5C 78 33 01 38 19 03
+            C9 19 03 92 01 7A CA 19 03)
+       (:|CONTABILIZA-PAUSAS?|
+        #Y(|COMMON-LISP-USER|::|DURACAO-TAREFA-1|
+           #27Y(00 00 00 00 02 00 00 00 21 18 00 10 00 B1 B3 31 90 DB B3 38 02
+                31 95 A1 11 19 04)
+           (|SYSTEM|::|*FORMAT-CS*| " \n")
+           (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+        |COMMON-LISP|::|*STANDARD-OUTPUT*| |COMMON-LISP-USER|::|TAREFA-PAUSA-P|
         #.|COMMON-LISP-USER|::|DURACAO_PAUSA| 0.)
        (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
        (|COMMON-LISP-USER|::|TAREFA| |COMMON-LISP|::|&KEY|
@@ -86,15 +123,22 @@
 	 * A duração da tarefa."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|52 68 (DEFUN DURACAO-TURNO (TURNO &KEY #) ...)-9|
+#Y(#:|74 91 (DEFUN DURACAO-TURNO (TURNO &KEY #) ...)-11|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|DURACAO-TURNO| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|DURACAO-TURNO|
-       #70Y(00 00 00 00 01 00 00 00 A6 1C 01 00 00 00 3B 01 02 7E 01 AE 2F 01
-            5C 5C 5C 78 A0 5B 5C 5C 78 73 01 38 93 02 1E DC A1 5B 78 25 03 02
-            85 00 B0 2F 01 78 25 03 02 85 00 AD DE AE 73 02 39 82 02 37 01 16
-            01 15 19 03)
-       (:|CONTABILIZA-PAUSAS?| |COMMON-LISP-USER|::|LAST-TURNO| 0.
+       #78Y(00 00 00 00 01 00 00 00 A6 1C 01 00 00 00 3B 01 02 7E 01 DB 6B 02
+            B0 33 02 15 AE 2F 03 5C 5C 5C 78 AF 2F 04 5C 5C 78 73 01 38 93 02
+            1E DF A1 5B 78 25 06 02 85 00 B0 2F 03 78 25 06 02 85 00 AD E1 AE
+            73 02 39 82 02 37 01 16 01 15 19 03)
+       (:|CONTABILIZA-PAUSAS?|
+        #Y(|COMMON-LISP-USER|::|DURACAO-TURNO-1|
+           #27Y(00 00 00 00 02 00 00 00 21 18 00 10 00 B1 B3 31 90 DB B3 38 02
+                31 95 A1 11 19 04)
+           (|SYSTEM|::|*FORMAT-CS*| " \n")
+           (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+        |COMMON-LISP|::|*STANDARD-OUTPUT*| |COMMON-LISP-USER|::|LAST-TAREFA|
+        |COMMON-LISP-USER|::|CAR-TURNO| 0.
         #.|COMMON-LISP-USER|::|CARACTER_PAUSA| 40.)
        (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
        (|COMMON-LISP-USER|::|TURNO| |COMMON-LISP|::|&KEY|
@@ -107,7 +151,7 @@
 	 * A duração do turno."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|70 80 (DEFUN TAREFAS-SOBREPOSTAS-P (TAREFA1 TAREFA2) ...)-10|
+#Y(#:|93 103 (DEFUN TAREFAS-SOBREPOSTAS-P (TAREFA1 TAREFA2) ...)-12|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|TAREFAS-SOBREPOSTAS-P|
     |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
@@ -125,7 +169,7 @@
 	 * T se se sobrepuserem, NIL caso contrário."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|82 89 (DEFUN TURNO-PAUSA NIL ...)-11|
+#Y(#:|105 112 (DEFUN TURNO-PAUSA NIL ...)-13|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|TURNO-PAUSA| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|TURNO-PAUSA|
@@ -138,22 +182,7 @@
 	 * Uma lista com apenas 1 elemento, o caracter de pausa."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|91 100 (DEFUN LAST-TURNO (TURNO) ...)-12|
-   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
-   (|COMMON-LISP-USER|::|LAST-TURNO| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
-    #Y(|COMMON-LISP-USER|::|LAST-TURNO|
-       #18Y(00 00 00 00 01 00 00 00 26 02 AD 38 01 31 A9 5B 19 02) ()
-       (|COMMON-LISP|::|T| |COMMON-LISP|::|NIL| |COMMON-LISP|::|NIL|)
-       (|COMMON-LISP-USER|::|TURNO|)
-       "Função last modificada para devolver apenas a tarefa, \n
-	 em vez de uma lista com uma tarefa.\n
-	 Argumentos:\n
-	 * turno -- o turno do qual será obtida a última tarefa.\n
-	 Retorno:\n
-	 * Uma lista de 4 elementos, correspondente a uma tarefa."
-       1))
-   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|102 163 (DEFUN UNE-TURNOS (TURNO1 TURNO2) ...)-13|
+#Y(#:|116 176 (DEFUN UNE-TURNOS (TURNO1 TURNO2) ...)-14|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|UNE-TURNOS| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|UNE-TURNOS|
@@ -168,7 +197,8 @@
              6E 03 0F 82 02 37 02 14 EA 91 01 32 0A AF 2E 0C 14 7B 01 82 02 23
              03 AF AD 7B 01 82 02 23 03 83 01 AD 8D 9F 54 16 03 EB 6B 07 AE AF
              6F 03 33 03 15 AC 6F 03 DE 90 01 32 FF BC 15 19 04 19 05)
-       (|COMMON-LISP-USER|::|LAST-TURNO| #.|COMMON-LISP-USER|::|CARACTER_PAUSA|
+       (|COMMON-LISP-USER|::|LAST-TAREFA|
+        #.|COMMON-LISP-USER|::|CARACTER_PAUSA|
         |COMMON-LISP-USER|::|TAREFAS-SOBREPOSTAS-P|
         |COMMON-LISP-USER|::|DURACAO-TURNO| 480. 0.
         #Y(|COMMON-LISP-USER|::|UNE-TURNOS-1|
@@ -208,14 +238,15 @@
 	   NIL caso não seja possível."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|165 185 (DEFUN LE-PROBLEMA (PROBLEMA) ...)-14|
+#Y(#:|178 199 (DEFUN LE-PROBLEMA (PROBLEMA) ...)-15|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|LE-PROBLEMA| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|LE-PROBLEMA|
-       #42Y(00 00 00 00 01 00 00 00 26 02 AD 63 1B 13 87 01 00 78 25 00 02 2E
-            01 AC 6F 02 24 00 02 2E 01 83 01 AD 8D 9F 69 16 02 00 19 02)
-       (|COMMON-LISP-USER|::|L1| |COMMON-LISP-USER|::|TURNO-PAUSA|
-        |COMMON-LISP-USER|::|LAST-TURNO|)
+       #74Y(00 00 00 00 01 00 00 00 26 02 01 02 AF 63 1B 31 87 01 00 78 24 00
+            08 AE 2E 01 14 82 02 23 02 AE AD 7B 01 82 02 23 02 9D 5C 78 24 00
+            08 AE 2E 01 14 82 02 23 02 AF AF 7B 01 82 02 23 03 7D 02 83 01 AD
+            8D 9F 4B 16 02 9E 19 04)
+       (|COMMON-LISP-USER|::|L1| |COMMON-LISP-USER|::|TURNO-PAUSA|)
        (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
        (|COMMON-LISP-USER|::|PROBLEMA|)
        "Le um problema na sua representação externa e transforma-o para a sua\n
@@ -228,16 +259,25 @@
 	 * Lista de turnos correspondente ao estado inicial de um problema."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|187 195 (DEFUN GERA-SUCESSORES (ESTADO) ...)-15|
+#Y(#:|201 224 (DEFUN GERA-SUCESSORES (ESTADO) ...)-16|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|GERA-SUCESSORES| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|GERA-SUCESSORES|
-       #13Y(00 00 00 00 01 00 00 00 26 02 C5 19 02)
-       ("Gera a lista de sucessores dado um estado.\n
+       #65Y(00 00 00 00 01 00 00 00 26 02 63 AE AF 63 1B 28 87 01 00 DA 6B 01
+            33 01 15 A2 5C FA 1D 18 AE 63 1B 0E 87 01 00 B1 AF AE 70 02 82 02
+            23 05 83 01 AD 8D 9F 6E 16 02 83 01 AD 8D 9F 54 16 02 9E 19 04)
+       (#Y(|COMMON-LISP-USER|::|GERA-SUCESSORES-1|
+           #23Y(00 00 00 00 01 00 00 00 21 17 00 10 00 DB B2 38 02 31 95 A1 11
+                19 03)
+           (|SYSTEM|::|*FORMAT-CS*| "################ \n")
+           (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+        |COMMON-LISP|::|*STANDARD-OUTPUT*| |COMMON-LISP-USER|::|UNE-TURNOS|)
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
+       (|COMMON-LISP-USER|::|ESTADO|)
+       "Gera a lista de sucessores dado um estado.\n
 	 Argumentos:\n
 	 * estado -- lista de turnos.\n
 	 Retorno:\n
-	 * Lista de estados que representa os estados gerados.")
-       (|COMMON-LISP|::|NIL| |COMMON-LISP|::|NIL| |COMMON-LISP|::|NIL|)
-       (|COMMON-LISP-USER|::|ESTADO|) |COMMON-LISP|::|NIL| 1))
+	 * Lista de estados que representa os estados gerados."
+       1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))

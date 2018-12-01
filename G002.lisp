@@ -6,7 +6,7 @@
 (defconstant DURACAO_ANTES_REFEICAO 240)
 (defconstant CARACTER_PAUSA 'P)
 
-(defun car-turno (turno)
+(defun car-turno-sem-pausa (turno)
 	
 	"Função car modificada para extrair o primeiro elemento
 	 que não seja o caracter da pausa CARACTER_PAUSA.
@@ -23,6 +23,28 @@
 		 			(setf resultado (car resto))
 		 			(setf resto (cdr resto)))
 				(return resultado)))))
+
+(defun last-turno-sem-pausa (turno)
+	
+	"Função last modificada para extrair o ultimo elemento
+	 que não seja o caracter da pausa CARACTER_PAUSA.
+	 Argumentos:
+	 * turno -- Lista de tarefas.
+	 Retorno:
+	 * O ultimo turno da lista"
+
+	(car-turno-sem-pausa (reverse turno)))
+
+(defun last-tarefa (turno)
+
+	"Função last modificada para devolver apenas a tarefa, 
+	 em vez de uma lista com uma tarefa.
+	 Argumentos:
+	 * turno -- o turno do qual será obtida a última tarefa.
+	 Retorno:
+	 * Uma lista de 4 elementos, correspondente a uma tarefa."
+
+	 (car (last turno)))
 
 (defun tarefa-pausa-p (tarefa)
 
@@ -42,7 +64,7 @@
 	 * contabiliza-pausas? -- booleano que indica se pausas devem ser contabilizadas
 	 Retorno:
 	 * A duração da tarefa."
-
+	;(format t "duracao-tarefa ~A ~%" tarefa)
 	(if (tarefa-pausa-p tarefa)
 		(if contabiliza-pausas? 
 			DURACAO_PAUSA
@@ -57,12 +79,13 @@
 	 * contabiliza-pausas? -- booleano que indica se pausas devem ser contabilizadas
 	 Retorno:
 	 * A duração do turno."
-	(let ((duracao-total (- (nth 3 (last-turno turno)) (nth 2 (car turno)))))
+	;(format t "duracao-turno ~A ~%" turno )
+	(let ((duracao-total (- (nth 3 (last-turno-sem-pausa turno)) (nth 2 (car-turno-sem-pausa turno)))))
 		(if contabiliza-pausas?
 			(let ((num-pausas 0))
 				(if (eq (car (car turno)) CARACTER_PAUSA)
 					(setf num-pausas (1+ num-pausas)))
-				(if (eq (car (last-turno turno)) CARACTER_PAUSA)
+				(if (eq (car (last-tarefa turno)) CARACTER_PAUSA)
 					(setf num-pausas (1+ num-pausas)))
 				(setf duracao-total (+ duracao-total (* num-pausas DURACAO_PAUSA)))))
 		duracao-total))
@@ -88,16 +111,7 @@
 
 	 (list (list CARACTER_PAUSA)))
 
-(defun last-turno (turno)
 
-	"Função last modificada para devolver apenas a tarefa, 
-	 em vez de uma lista com uma tarefa.
-	 Argumentos:
-	 * turno -- o turno do qual será obtida a última tarefa.
-	 Retorno:
-	 * Uma lista de 4 elementos, correspondente a uma tarefa."
-
-	 (car (last turno)))
 
 (defun une-turnos (turno1 turno2)
 
@@ -109,22 +123,21 @@
 	 * Novo turno gerado de unir turno1 e turno2 se puderem ser unidos,
 	   NIL caso não seja possível."
 
-	(if (eq (car (last-turno turno1)) CARACTER_PAUSA)
+	(if (eq (car (last-tarefa turno1)) CARACTER_PAUSA)
 		(setf turno1 (butlast turno1)))
 	(if (eq (car (car turno2)) CARACTER_PAUSA)
 		(setf turno2 (cdr turno2)))
-	;(format t "ffff ~%")
 	(let ((turno-auxiliar turno1)
 		  (turno-resultado '()))
-		(if (and (not (tarefas-sobrepostas-p (last-turno turno1) (car turno2)))
+		(if (and (not (tarefas-sobrepostas-p (last-tarefa turno1) (car turno2)))
 				 (<=  (duracao-turno turno1) DURACAO_MAX_TURNO)
 				 (<=  (duracao-turno turno2) DURACAO_MAX_TURNO))
 			(progn
 				(let ((num_pausas 0)
-					  (chegada-turno1 (nth 1 (last-turno turno1)))
+					  (chegada-turno1 (nth 1 (last-tarefa turno1)))
 					  (partida-turno2 (car (car turno2))))
-					(format t "t1= ~A t2= ~A ~%" turno1 turno2)
-					(format t "ct1= ~A pt2= ~A ~%" chegada-turno1 partida-turno2)
+					;(format t "t1= ~A t2= ~A ~%" turno1 turno2)
+					;(format t "ct1= ~A pt2= ~A ~%" chegada-turno1 partida-turno2)
 					;;((L8 L9 89 99)) ((L2 L4 45 55)) destinos e partidas diferentes e ambos diferentes de L1
 					;; necessitam de fazer 2 pausas, voltar a L1 e sair de L1
 					(if (and (not (eq chegada-turno1 'L1))
@@ -148,14 +161,14 @@
 						(setf turno-auxiliar (append turno-auxiliar (turno-pausa)))))
 				(setf turno-auxiliar (append turno-auxiliar turno2))
 				;;refeições!
-				(format t "pre refeicoes ~A ~%" turno-auxiliar)
+				;(format t "pre refeicoes ~A ~%" turno-auxiliar)
 				(let ((duracao-corrente 0))
 					 (dolist (tarefa turno-auxiliar)
 					 	(setf duracao-corrente (+ duracao-corrente (duracao-tarefa tarefa :contabiliza-pausas? NIL)))
 					 	(if (> duracao-corrente DURACAO_ANTES_REFEICAO)
 					 		(setf turno-resultado (append turno-resultado (list (turno-pausa)))))
 					 	(setf turno-resultado (append turno-resultado (list tarefa)))))
-				(format t "pos refeicoes ~A  ~A minutos ~%" turno-resultado (duracao-turno turno-resultado))
+				;(format t "pos refeicoes ~A  ~A minutos ~%" turno-resultado (duracao-turno turno-resultado))
 				;;após cumprir estes requisitos todos o turno continua válido?
 				(if (> (duracao-turno turno-resultado) DURACAO_MAX_TURNO)
 					NIL
@@ -186,11 +199,35 @@
 		estado-resultado))
 
 (defun gera-sucessores (estado)
-	estado
-	"Gera a lista de sucessores dado um estado.
+
+	"Gera a lista de sucessores dado um estado, em que cada sucessor
+	 consiste em 1 união de 2 turnos, mantendo-se os outros turnos iguais.
 	 Argumentos:
 	 * estado -- lista de turnos.
 	 Retorno:
 	 * Lista de estados que representa os estados gerados."
 
-	)
+	 (let ((novos-estados '())
+	 	   (estado-restante estado)
+	 	   ;; prefixo e sufixo para adicionar antes e depois de cada novo turno gerado.
+	 	   (prefixo '())
+	 	   (sufixo '())
+	 	   (novo-estado '()))
+	 	(dolist (turno estado)
+	 		;(format t "### ~A #### ~%" turno)
+	 		;(format t "novos-estados: ~A ~%" novos-estados)
+
+	 		(setf estado-restante (cdr estado-restante))
+	 		(setf sufixo (cdr estado-restante))
+	 		;(format t "o que falta ~A ~%" estado-restante)
+
+	 		(if (not (NULL estado-restante))
+	 			(let ((novo-turno (une-turnos turno (car estado-restante))))
+	 				;(format t "turno possível: ~A  ~%" novo-turno)
+	 				(if (not (null novo-turno))
+	 					(progn
+	 						(setf novo-estado (append prefixo (append (list novo-turno) sufixo)))
+	 						;(format t "adicionando o estado ~A  ~%" novo-estado)
+	 						(setf novos-estados (append novos-estados (list novo-estado)))))))
+	 		(setf prefixo (append prefixo (list turno))))
+	 	novos-estados))
