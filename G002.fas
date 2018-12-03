@@ -63,10 +63,9 @@
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|DURACAO-TAREFA| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|DURACAO-TAREFA|
-       #28Y(00 00 00 00 01 00 00 00 26 02 DA 9F 5C 5C 5C 78 A0 5C 5C 78 73 01
-            38 33 01 35 19 02)
-       (#.|COMMON-LISP-USER|::|+DURACAO-MIN-TURNO+|)
-       (|COMMON-LISP|::|T| |COMMON-LISP|::|NIL| |COMMON-LISP|::|NIL|)
+       #24Y(00 00 00 00 01 00 00 00 26 02 9E 5C 5C 5C 78 9F 5C 5C 78 33 01 38
+            19 02)
+       () (|COMMON-LISP|::|T| |COMMON-LISP|::|NIL| |COMMON-LISP|::|NIL|)
        (|COMMON-LISP-USER|::|TAREFA|)
        "Calcula a duração de uma tarefa.\n\n
 	 Argumentos:\n
@@ -80,13 +79,14 @@
    (|COMMON-LISP-USER|::|DURACAO-TOTAL-TURNO|
     |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|DURACAO-TOTAL-TURNO|
-       #67Y(00 00 00 00 01 00 00 00 26 02 DA 94 02 AF 6F 01 DA 94 02 24 02 02
+       #72Y(00 00 00 00 01 00 00 00 26 02 DA 94 02 AF 6F 01 DA 94 02 24 02 02
             85 03 9E 5C 78 24 02 02 85 03 B1 63 1B 0D 87 01 00 AE AD 6F 03 82
-            02 37 02 83 01 AD 8D 9F 6F 16 02 AC DE B1 73 02 39 33 02 37 3F 19
-            06)
+            02 37 02 83 01 AD 8D 9F 6F 16 02 AC DE B1 73 02 39 82 02 37 00 DF
+            AD 33 01 35 19 06)
        (0. |COMMON-LISP-USER|::|LAST-TURNO|
         #.|COMMON-LISP-USER|::|+LOCAL-INICIAL+|
-        |COMMON-LISP-USER|::|DURACAO-TAREFA| 40.)
+        |COMMON-LISP-USER|::|DURACAO-TAREFA| 40.
+        #.|COMMON-LISP-USER|::|+DURACAO-MIN-TURNO+|)
        (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
        (|COMMON-LISP-USER|::|TURNO|)
        "Calcula a duração total de um turno, desde o inicio (contabilizando deslocações inicial e final).\n\n
@@ -96,7 +96,7 @@
 	 * A duração do turno."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|61 73 (DEFUN DURACAO-CONDUCAO-TURNO (TURNO) ...)-10|
+#Y(#:|62 74 (DEFUN DURACAO-CONDUCAO-TURNO (TURNO) ...)-10|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|DURACAO-CONDUCAO-TURNO|
     |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
@@ -113,7 +113,7 @@
 	 * A duração de condução feita num turno."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|76 92 (DEFUN TAREFAS-SOBREPOSTAS-P (TAREFA1 TAREFA2) ...)-11|
+#Y(#:|77 93 (DEFUN TAREFAS-SOBREPOSTAS-P (TAREFA1 TAREFA2) ...)-11|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|TAREFAS-SOBREPOSTAS-P|
     |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
@@ -131,56 +131,45 @@
 	 * T se se sobrepuserem, NIL caso contrário."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|94 108 (DEFUN LE-ESTADO-INICIAL (INPUT) ...)-12|
-   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
-   (|COMMON-LISP-USER|::|LE-ESTADO-INICIAL| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
-    #Y(|COMMON-LISP-USER|::|LE-ESTADO-INICIAL|
-       #39Y(00 00 00 00 01 00 00 00 26 02 63 AE 63 1B 0F 87 01 00 AE AD 7B 01
-            7B 01 82 02 23 02 83 01 AD 8D 9F 6D 16 02 15 19 02)
-       () (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
-       (|COMMON-LISP-USER|::|INPUT|)
-       "Le um problema na sua representação externa e transforma-o para a sua\n
-	 representação interna, transformando cada tarefa num turno.\n\n
-	 Argumentos:\n
-	 * input-- lista de tarefas correspondente à \n
-	               representação externa de um problema a resolver.\n
-	 Retorno:\n
-	 * Lista de turnos correspondente ao estado inicial de um problema."
-       1))
-   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|111 135 (DEFUN TEM-VAGA-P (TURNO CONTRARIO?) ...)-13|
+#Y(#:|96 130 (DEFUN TEM-VAGA-P (TURNO CONTRARIO? LIMITE) ...)-12|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|TEM-VAGA-P| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|TEM-VAGA-P|
-       #107Y(00 00 00 00 02 00 00 00 26 03 AE 72 62 72 B2 DA 1B 80 4C 02 19 07
-             93 03 08 AD AD 73 01 38 81 B2 00 AC B1 71 A1 96 01 B2 71 A1 94 00
-             9F 5C 5B 23 11 9D 5C 5C 78 9F 5C 5C 5C 78 73 01 38 DB 90 01 34 51
-             94 00 9F 5C 5B 22 12 9D 5C 5C 78 9F 5C 5C 5C 78 73 01 38 DC 90 01
-             34 FF B8 16 02 85 00 AC AE 91 01 34 FF B0 16 02 00 19 03)
-       (0. 40. 80.) (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
-       (|COMMON-LISP-USER|::|TURNO| |COMMON-LISP-USER|::|CONTRARIO?|)
+       #175Y(00 00 00 00 03 00 00 00 26 04 AF 72 62 72 B2 DA 1B 80 90 00 19 08
+             02 19 08 93 04 08 AD AD 73 01 38 81 B2 00 AC B2 71 A1 96 01 B3 71
+             A1 93 06 0D B1 9F 5C 5C 78 73 01 38 DB 90 01 32 56 0E 02 1C 2C 9E
+             5C 78 9E 5B 22 0F 9E 5C 5C 5C 78 B2 73 01 38 DD 90 01 32 FF BC 9E
+             5C 78 9E 5B 23 0F 9E 5C 5C 5C 78 B2 73 01 38 DE 90 01 32 FF A6 94
+             00 9F 5C 5B 23 12 9D 5C 5C 78 9F 5C 5C 5C 78 73 01 38 DF 90 01 34
+             FF 90 94 00 9F 5C 5B 22 12 9D 5C 5C 78 9F 5C 5C 5C 78 73 01 38 E0
+             90 01 34 FF 77 16 02 85 00 AC AE 91 01 34 FF 6F 16 02 00 19 04)
+       (0. 240. |COMMON-LISP-USER|::|CONTRARIO| 160. 200. 40. 80.)
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
+       (|COMMON-LISP-USER|::|TURNO| |COMMON-LISP-USER|::|CONTRARIO?|
+        |COMMON-LISP-USER|::|LIMITE|)
        "Verifica se um turno tem espaço para refeição.\n\n
 	 Argumentos:\n
 	 * turno -- lista de tarefas.\n
 	 * contrario? -- T o início ao fim, NIL caso contrário\n
+	 * limite -- \n
 	 Retorno:\n
 	 * T se existir espaço para refeicão, NIl caso contrário."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|138 200 (DEFUN UNE-TURNOS (TURNO1 TURNO2) ...)-14|
+#Y(#:|133 196 (DEFUN UNE-TURNOS (TURNO1 TURNO2) ...)-13|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|UNE-TURNOS| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|UNE-TURNOS|
-       #208Y(00 00 00 00 02 00 00 00 26 03 94 02 AF 6F 00 94 03 B0 6F 00 A0 5C
+       #216Y(00 00 00 00 02 00 00 00 26 03 94 02 AF 6F 00 94 03 B0 6F 00 A0 5C
              5C 78 9F 5C 5C 78 A1 5C 5C 5C 78 A0 5C 5C 5C 78 94 07 94 06 A5 5C
              78 A4 5C 78 BA 6F 01 BA 6F 01 B1 24 02 06 DD B6 82 02 37 09 AE 24
-             02 06 DE B3 82 02 37 06 63 B3 B7 73 01 38 DF 91 01 33 80 67 B9 B9
-             8A 06 80 61 AE E1 91 01 32 07 AD E1 90 01 33 80 5E AD E1 91 01 32
-             07 AE E1 90 01 33 80 51 AE E1 91 01 33 80 40 AD E1 91 01 33 3A AE
-             AE 73 02 37 E1 90 01 33 3A AE AE 73 02 37 E1 91 01 32 26 B5 B5 73
-             01 38 DE 91 01 34 04 B1 A2 22 22 B5 B5 73 01 38 E2 91 01 34 04 B1
-             A2 23 14 BD 64 8A 09 0F BC 63 8A 09 0A 9D 1F 0E BD BD 33 02 23 19
-             12 7E 00 9D 1F 02 1B 72 19 12)
+             02 06 DE B3 82 02 37 06 63 B3 B7 73 01 38 DF 91 01 33 80 6F B9 B9
+             8A 06 80 69 AE E1 91 01 32 07 AD E1 90 01 33 80 66 AD E1 91 01 32
+             07 AE E1 90 01 33 80 59 AE E1 91 01 33 80 48 AD E1 91 01 33 80 41
+             AE AE 73 02 37 E1 90 01 33 80 40 AE AE 73 02 37 E1 91 01 32 2C B5
+             B5 73 01 38 DE 91 01 34 04 B1 A2 22 28 B5 B5 73 01 38 E2 91 01 34
+             04 B1 A2 23 1A BD 64 B5 2D 03 09 1C 12 BC 63 B8 2D 03 09 1C 0A 9D
+             1F 0E BD BD 33 02 23 19 12 7E 00 9D 1F 02 1B 72 19 12)
        (|COMMON-LISP-USER|::|LAST-TURNO|
         |COMMON-LISP-USER|::|DURACAO-CONDUCAO-TURNO|
         #.|COMMON-LISP-USER|::|+LOCAL-INICIAL+| -40. 40. 480.
@@ -197,15 +186,38 @@
 	   NIL caso não seja possível."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|204 236 (DEFUN OPERADOR (ESTADO) ...)-15|
+#Y(#:|199 203 (DEFUN JUNTA-TURNOS (ESTADO TURNO1 INDEX1 ...) ...)-14|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|JUNTA-TURNOS| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|JUNTA-TURNOS|
+       #41Y(00 00 00 00 05 00 00 00 26 06 B1 71 AB B1 B0 8A 00 03 00 19 07 B0
+            AD B2 AF 71 A1 B2 73 02 23 2D 03 01 AE AD 30 02 3F 19 07)
+       (|COMMON-LISP-USER|::|UNE-TURNOS| |SYSTEM|::|%SETNTH|
+        |COMMON-LISP-USER|::|REMOVE-NTH|)
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
+       (|COMMON-LISP-USER|::|ESTADO| |COMMON-LISP-USER|::|TURNO1|
+        |COMMON-LISP-USER|::|INDEX1| |COMMON-LISP-USER|::|TURNO2|
+        |COMMON-LISP-USER|::|INDEX2|)
+       |COMMON-LISP|::|NIL| 1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|206 212 (DEFUN REMOVE-NTH (N LIST) ...)-15|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|REMOVE-NTH| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|REMOVE-NTH|
+       #32Y(00 00 00 00 02 00 00 00 26 03 AE 8E AC 0E 93 01 0B 94 01 97 03 95
+            03 28 71 5D 19 03 9E 5C 19 03)
+       () (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
+       (|COMMON-LISP-USER|::|N| |COMMON-LISP|::|LIST|) |COMMON-LISP|::|NIL| 1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|216 245 (DEFUN OPERADOR (ESTADO) ...)-16|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|OPERADOR| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|OPERADOR|
-       #81Y(00 00 00 00 01 00 00 00 26 02 63 AE 01 03 B2 63 1B 36 B1 AD 7B 01
-            B2 73 02 23 82 02 23 03 B3 B0 7B 01 82 02 23 07 16 01 1B 14 87 01
-            00 83 05 5C FB 93 05 0A AC 94 06 70 00 92 00 56 16 01 B0 AD 7B 01
-            82 02 23 04 83 01 AD 8D 9F 5E 16 02 A1 19 07)
-       (|COMMON-LISP-USER|::|UNE-TURNOS|)
+       #74Y(00 00 00 00 01 00 00 00 26 02 94 01 95 02 95 03 DA DB 63 93 04 31
+            1B 0F 87 04 05 85 02 83 04 FB AE 81 B1 01 93 04 20 B3 B2 B0 94 06
+            B1 2D 05 02 0F 03 1D 09 AC 6B 03 7B 01 82 02 23 00 83 03 85 01 93
+            03 54 92 04 60 15 19 07)
+       (0. 1. |COMMON-LISP-USER|::|JUNTA-TURNOS| |COMMON-LISP-USER|::|JUNTOU?|)
        (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
        (|COMMON-LISP-USER|::|ESTADO|)
        "Gera a lista de sucessores dado um estado, em que cada sucessor\n
@@ -216,7 +228,21 @@
 	 * Lista de estados que representa os estados gerados."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|239 249 (DEFUN OBJECTIVO-P (ESTADO) ...)-16|
+#Y(#:|246 283 (DEFUN N-TURNOS (ESTADO) ...)-17|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|N-TURNOS| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|N-TURNOS|
+       #15Y(00 00 00 00 01 00 00 00 26 02 AD 32 62 19 02) ()
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|NIL| |COMMON-LISP|::|NIL|)
+       (|COMMON-LISP-USER|::|ESTADO|)
+       "Calcula o numero de turnos num estado.\n\n
+	 Argumentos:\n
+	 * estado -- lista de turnos.\n
+	 Retorno:\n
+	 * Inteiro que representa o número de turnos."
+       1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|286 296 (DEFUN OBJECTIVO-P (ESTADO) ...)-18|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|OBJECTIVO-P| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|OBJECTIVO-P|
@@ -232,28 +258,76 @@
 	 * T se for objectivo, NIL caso contrário."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|251 252 (DEFUN HEURISTICA (ESTADO) ...)-17|
+#Y(#:|299 313 (DEFUN CUSTO-ESTADO (ESTADO) ...)-19|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|CUSTO-ESTADO| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|CUSTO-ESTADO|
+       #37Y(00 00 00 00 01 00 00 00 26 02 DA AE 63 1B 0D 87 01 00 AE AD 6F 01
+            82 02 37 02 83 01 AD 8D 9F 6F 16 02 15 19 02)
+       (0. |COMMON-LISP-USER|::|DURACAO-TOTAL-TURNO|)
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
+       (|COMMON-LISP-USER|::|ESTADO|)
+       "Calcula um custo de um estado, correspondente\n
+	 à soma dos custos de cada turno.\n\n
+	 Argumentos:\n
+	 * estado -- lista de turnos.\n
+	 Retorno:\n
+	 * Um turno que representa o custo do estado"
+       1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|315 324 (DEFUN TEMPO-SEM-TAREFA (ESTADO) ...)-20|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|TEMPO-SEM-TAREFA| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|TEMPO-SEM-TAREFA|
+       #13Y(00 00 00 00 01 00 00 00 26 02 C5 19 02)
+       ("Calcula a soma dos tempos entre as tarefas de cada turno.\n\n
+	 Argumentos:\n
+	 * estado -- lista de turnos.\n
+	 Retorno:\n
+	 * Um inteiro que representa a soma dos tempos entre tarefas")
+       |COMMON-LISP|::|NIL| (|COMMON-LISP-USER|::|ESTADO|) |COMMON-LISP|::|NIL|
+       1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|327 328 (DEFUN HEURISTICA (ESTADO) ...)-21|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|HEURISTICA| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|HEURISTICA|
-       #13Y(00 00 00 00 01 00 00 00 26 02 C5 19 02) (0.) |COMMON-LISP|::|NIL|
+       #17Y(00 00 00 00 01 00 00 00 26 02 DA AE 33 02 39 19 02) (0.)
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|NIL| |COMMON-LISP|::|NIL|)
        (|COMMON-LISP-USER|::|ESTADO|) |COMMON-LISP|::|NIL| 1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|254 282 (DEFUN FAZ-AFECTACAO (PROBLEMA ESTRATEGIA) ...)-18|
+#Y(#:|331 345 (DEFUN LE-ESTADO-INICIAL (INPUT) ...)-22|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|LE-ESTADO-INICIAL| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|LE-ESTADO-INICIAL|
+       #39Y(00 00 00 00 01 00 00 00 26 02 63 AE 63 1B 0F 87 01 00 AE AD 7B 01
+            7B 01 82 02 23 02 83 01 AD 8D 9F 6D 16 02 15 19 02)
+       () (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
+       (|COMMON-LISP-USER|::|INPUT|)
+       "Le um problema na sua representação externa e transforma-o para a sua\n
+	 representação interna, transformando cada tarefa num turno.\n\n
+	 Argumentos:\n
+	 * input-- lista de tarefas correspondente à \n
+	               representação externa de um problema a resolver.\n
+	 Retorno:\n
+	 * Lista de turnos correspondente ao estado inicial de um problema."
+       1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|348 378 (DEFUN FAZ-AFECTACAO (PROBLEMA ESTRATEGIA) ...)-23|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|FAZ-AFECTACAO| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|FAZ-AFECTACAO|
-       #68Y(00 00 00 00 02 00 00 00 26 03 AE 6F 00 99 01 7B 01 DC 99 03 7B 01
-            DE 99 05 7B 01 E0 99 07 7B 01 2D 08 08 FA AD E3 8E 14 18 AD E4 8E
-            14 13 AD E5 8E 14 0E AD E6 8E 14 09 AD E7 8E 14 04 AD E8 32 14 00
-            19 03)
+       #88Y(00 00 00 00 02 00 00 00 26 03 AE 6F 00 99 01 7B 01 DC 99 03 DE 99
+            05 E0 99 07 2D 08 08 FA 63 AE E3 8E 14 25 AE E4 8E 14 2B AE E7 8E
+            14 1B AE E8 8E 14 16 AE E9 8E 14 11 AE EA 8F 14 0C AF D6 14 30 0C
+            78 38 01 31 A9 5B F8 AC AD 2F 05 7A AD 2F 07 5D 19 04 AF D0 1B 67)
        (|COMMON-LISP-USER|::|LE-ESTADO-INICIAL| |COMMON-LISP-USER|::|OPERADOR|
         :|OBJECTIVO?| |COMMON-LISP-USER|::|OBJECTIVO-P| :|CUSTO|
-        |COMMON-LISP-USER|::|DURACAO-TOTAL-TURNO| :|HEURISTICA|
-        |COMMON-LISP-USER|::|HEURISTICA| |COMMON-LISP-USER|::|CRIA-PROBLEMA|
-        "melhor-abordagem" "a*.melhor.heuristica"
-        "a*.melhor.heuristica.alternativa" "sondagem.iterativa" "ILDS"
-        "abordagem.alternativa")
+        |COMMON-LISP-USER|::|CUSTO-ESTADO| :|HEURISTICA|
+        |COMMON-LISP-USER|::|N-TURNOS| |COMMON-LISP-USER|::|CRIA-PROBLEMA|
+        "melhor.abordagem" "a*.melhor.heuristica" "a*"
+        |COMMON-LISP-USER|::|PROCURA| "a*.melhor.heuristica.alternativa"
+        "sondagem.iterativa" "ILDS" "abordagem.alternativa" "profundidade")
        (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
        (|COMMON-LISP-USER|::|PROBLEMA| |COMMON-LISP-USER|::|ESTRATEGIA|)
        "Resolve um problema de afectação de recursos.\n\n

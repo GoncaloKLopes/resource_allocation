@@ -93,13 +93,14 @@
 		(< (nth 2 tarefa2) (+ (nth 3 tarefa1) (* pausa? +duracao-pausa+)))))
 
 
-(defun tem-vaga-p (turno contrario?)
+(defun tem-vaga-p (turno contrario? limite)
 
 	"Verifica se um turno tem espaço para refeição.
 
 	 Argumentos:
 	 * turno -- lista de tarefas.
 	 * contrario? -- T o início ao fim, NIL caso contrário
+	 * limite -- 
 	 Retorno:
 	 * T se existir espaço para refeicão, NIl caso contrário."
 
@@ -112,6 +113,15 @@
 				;(format t "t1= ~A  t2= ~A ~%" t1 t2)
 			    ;(format t "aux-vaga= ~A  ~%" (and (eq (nth 0 t2) (nth 1 t1))
 							 					  ;(>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+)))
+				(if (or (and contrario?
+						     (> (- limite (nth 2 t1)) +duracao-antes-refeicao+))
+						(and (not contrario?)
+							 (or (and (not (eq (nth 1 t1) (nth 0 t2)))
+							 		  (> (- (nth 3 t1) limite) (- +duracao-antes-refeicao+ (* 2 +duracao-pausa+)))) 
+							 	 (and (eq (nth 1 t1) (nth 0 t2))
+							 	 	  (> (- (nth 3 t1) limite) (- +duracao-antes-refeicao+ +duracao-pausa+))))))
+					(return-from tem-vaga-p NIL))
+
 				(if (or (and (eq (nth 0 t2) (nth 1 t1))
 							 (>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+));não é necessário um transporte.
 						(and (not (eq (nth 0 t2) (nth 1 t1)))
@@ -178,12 +188,28 @@
 										   (and (>= (- tempo-inicio-t2 tempo-fim-t1) (* 2 +duracao-pausa+))
 										        (not (eq local-inicio-t2 local-fim-t1))) ;existe espaço entre os turnos para refeição e transporte?
 
-										   (tem-vaga-p turno1 T) 
-										   (tem-vaga-p turno2 NIL)))))))
+										   (tem-vaga-p turno1 T tempo-fim-t2) 
+										   (tem-vaga-p turno2 NIL tempo-inicio-t1)))))))
 						(setf une? T))
 			(if une?
 				(append turno1 turno2)
 				NIL))))
+
+
+(defun junta-turnos (estado turno1 index1 turno2 index2)
+  (let ((turnos (copy-list estado)))
+    (cond ((une-turnos turno1 turno2)
+           (setf (nth index1 turnos) (append (nth index1 turnos) turno2))
+           (setf turnos (remove-nth index2 turnos))turnos))))
+
+
+(defun remove-nth (n list)
+  (declare
+    (type (integer 0) n)
+    (type list list))
+  (if (or (zerop n) (null list))
+    (cdr list)
+    (cons (car list) (remove-nth (1- n) (cdr list)))))
 
 
 
@@ -196,6 +222,28 @@
 	 Retorno:
 	 * Lista de estados que representa os estados gerados."
 
+	   (let ((primeiro (first estado))
+        (resto (rest estado))
+        (resto-aux (rest estado))
+        (i 0)
+        (j 1)
+        (resultado '())
+        (juntou? NIL))
+    (loop 
+      (if (null resto) (return))
+      (progn
+        (setf juntou? (junta-turnos estado primeiro i (first resto-aux) j)) 
+        (if juntou?
+            (setf resultado  (append resultado (list juntou?))))
+        (setf resto-aux (rest resto-aux))
+        (setf j (1+ j))
+        (cond ((null resto-aux) 
+               (setf primeiro (first resto))
+               (setf i (1+ i))
+               (setf resto (rest resto))
+               (setf resto-aux resto)
+               (setf j (1+ i))))))resultado))
+#|
 	 ;(format t "~% ~% BIIIIG BOOOOYYYYYY ~A ~% ~%" estado)
 	 (let ((novos-estados '())
 	 	   (estado-restante estado)
@@ -220,7 +268,7 @@
 	 						;(format t "adicionando o estado ~A  ~%" novo-estado)
 	 						(setf novos-estados (append novos-estados (list novo-estado)))))))
 	 		(setf prefixo (append prefixo (list turno))))
-	 	novos-estados))
+	 	novos-estados))|#
 
 
 (defun n-turnos (estado)
@@ -264,6 +312,17 @@
 	 		(setf duracao (+ duracao (duracao-total-turno turno))))
 	 	duracao))
 
+(defun tempo-sem-tarefa (estado)
+
+	"Calcula a soma dos tempos entre as tarefas de cada turno.
+
+	 Argumentos:
+	 * estado -- lista de turnos.
+	 Retorno:
+	 * Um inteiro que representa a soma dos tempos entre tarefas"
+
+	)
+
 
 (defun heuristica (estado)
 	(* estado 0))
@@ -301,13 +360,13 @@
 								  (list #'operador)
 								  :objectivo? #'objectivo-p
 								  :custo #'custo-estado
-								  :heuristica #'heuristica))
+								  :heuristica #'n-turnos))
 	(let ((solucao NIL))
 		(cond 
 			((equal estrategia "melhor.abordagem")
 				NIl)
 			((equal estrategia "a*.melhor.heuristica")
-				NIL)
+				(setf solucao (car (last (car (procura problema "a*"))))))
 			((equal estrategia "a*.melhor.heuristica.alternativa")
 				NIL)
 			((equal estrategia "sondagem.iterativa")

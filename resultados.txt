@@ -1,0 +1,3 @@
+dfs - 79 turnos, 28440 minutos 
+bfs - 79 turnos, 28440 minutos 
+a*(n turnos) - 79 turnos, 28440 minutos 
