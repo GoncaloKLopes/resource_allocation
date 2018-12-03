@@ -30,7 +30,7 @@
 	 * tarefa -- Lista de 4 elementos que representa uma tarefa.
 	 Retorno:
 	 * Um inteiro que representa a duração da tarefa em minutos."
-
+	 ;(format t "~A ~%" tarefa)
 	(- (nth 3 tarefa) (nth 2 tarefa)))
 
 
@@ -42,7 +42,7 @@
 	 * turno -- Lista de tarefas.
 	 Retorno:
 	 * A duração do turno."
-
+;(format t "~A ~%" turno)
 	(let ((num-pausas 0)
 		  (primeira-tarefa (car turno))
 		  (ultima-tarefa (last-turno turno))
@@ -57,6 +57,7 @@
 			(setf duracao (+ duracao (duracao-tarefa tarefa))))
 		(setf duracao (+ duracao (* num-pausas +duracao-pausa+)))
 		(max +duracao-min-turno+ duracao)))
+
 
 (defun duracao-conducao-turno (turno)
 
@@ -82,7 +83,7 @@
 	 * tarefa2 -- Lista de 4 ou 1 elemento(s).
 	 Retorno:
 	 * T se se sobrepuserem, NIL caso contrário."
-
+	 ;(format t "~A ~A ~%" tarefa1 tarefa2)
 	;;se for necessaria uma pausa para deslocação entre as duas tarefas 
 	;;deve ser contabilizado esse tempo extra
 	(let ((pausa? 0)) ;0 ou 1 em vez de booleano para poder ser usado na multiplicação
@@ -90,22 +91,6 @@
 			(setf pausa? 1))
 
 		(< (nth 2 tarefa2) (+ (nth 3 tarefa1) (* pausa? +duracao-pausa+)))))
-
-(defun le-estado-inicial (input)
-
-	"Le um problema na sua representação externa e transforma-o para a sua
-	 representação interna, transformando cada tarefa num turno.
-
-	 Argumentos:
-	 * input-- lista de tarefas correspondente à 
-	               representação externa de um problema a resolver.
-	 Retorno:
-	 * Lista de turnos correspondente ao estado inicial de um problema."
-
-  (let ((problema '()))
-    (dolist (i input)
-      (setf problema (append problema (list (list i)))))
-  	problema))
 
 
 (defun tem-vaga-p (turno contrario?)
@@ -145,6 +130,7 @@
 	 * Novo turno gerado de unir turno1 e turno2 se puderem ser unidos,
 	   NIL caso não seja possível."
 
+	;(format t "uniao ~A ~A ~%" turno1 turno2)
 	(let* ((primeira-tarefa-t1 (car turno1))
 		   (ultima-tarefa-t1 (last-turno turno1))
 		   (primeira-tarefa-t2 (car turno2))
@@ -210,6 +196,7 @@
 	 Retorno:
 	 * Lista de estados que representa os estados gerados."
 
+	 ;(format t "~% ~% BIIIIG BOOOOYYYYYY ~A ~% ~%" estado)
 	 (let ((novos-estados '())
 	 	   (estado-restante estado)
 	 	   ;; prefixo e sufixo para adicionar antes e depois de cada novo turno gerado.
@@ -231,7 +218,7 @@
 	 					(progn
 	 						(setf novo-estado (append prefixo (append (list novo-turno) sufixo)))
 	 						;(format t "adicionando o estado ~A  ~%" novo-estado)
-	 						(setf novos-estados (append novos-estados novo-estado))))))
+	 						(setf novos-estados (append novos-estados (list novo-estado)))))))
 	 		(setf prefixo (append prefixo (list turno))))
 	 	novos-estados))
 
@@ -248,8 +235,44 @@
 
 	 (null (operador estado)))
 
+
+(defun custo-estado (estado)
+	
+	"Calcula um custo de um estado, correspondente
+	 à soma dos custos de cada turno.
+
+	 Argumentos:
+	 * estado -- lista de turnos.
+	 Retorno:
+	 * Um turno que representa o custo do estado"
+	 (format t " cost ~A ~%" turno)
+	 (let ((duracao 0))
+	 	(dolist (turno estado)
+	 		(setf duracao (+ duracao (duracao-total-turno turno))))
+	 	duracao))
+
+
 (defun heuristica (estado)
+
 	0)
+
+
+(defun le-estado-inicial (input)
+
+	"Le um problema na sua representação externa e transforma-o para a sua
+	 representação interna, transformando cada tarefa num turno.
+
+	 Argumentos:
+	 * input-- lista de tarefas correspondente à 
+	               representação externa de um problema a resolver.
+	 Retorno:
+	 * Lista de turnos correspondente ao estado inicial de um problema."
+
+  (let ((problema '()))
+    (dolist (i input)
+      (setf problema (append problema (list (list i)))))
+  	problema))
+
 
 (defun faz-afectacao (problema estrategia)
 
@@ -264,9 +287,9 @@
 	;;começar por transformar a lista de tarefas numa lista de turnos
 	(setf problema (cria-problema (le-estado-inicial problema)
 								  (list #'operador)
-								  :objectivo? (list #'objectivo-p)
-								  :custo (list #'duracao-total-turno)
-								  :heuristica (list #'heuristica)))
+								  :objectivo? #'objectivo-p
+								  :custo #'custo-estado
+								  :heuristica #'heuristica))
 	(cond 
 		((equal estrategia "melhor-abordagem")
 			NIl)
