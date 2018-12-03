@@ -110,7 +110,7 @@
 			(let ((t1 (nth i turno))
 				  (t2 (nth (1+ i) turno)))
 				;(format t "t1= ~A  t2= ~A ~%" t1 t2)
-			  ;  (format t "aux-vaga= ~A  ~%" (and (eq (nth 0 t2) (nth 1 t1))
+			    ;(format t "aux-vaga= ~A  ~%" (and (eq (nth 0 t2) (nth 1 t1))
 							 					  ;(>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+)))
 				(if (or (and (eq (nth 0 t2) (nth 1 t1))
 							 (>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+));não é necessário um transporte.
@@ -245,7 +245,8 @@
 	 * estado -- lista de turnos.
 	 Retorno:
 	 * Um turno que representa o custo do estado"
-	 (format t " cost ~A ~%" turno)
+	 
+	 (format t " cost ~A ~%" estado)
 	 (let ((duracao 0))
 	 	(dolist (turno estado)
 	 		(setf duracao (+ duracao (duracao-total-turno turno))))
@@ -290,16 +291,18 @@
 								  :objectivo? #'objectivo-p
 								  :custo #'custo-estado
 								  :heuristica #'heuristica))
-	(cond 
-		((equal estrategia "melhor-abordagem")
-			NIl)
-		((equal estrategia "a*.melhor.heuristica")
-			NIL)
-		((equal estrategia "a*.melhor.heuristica.alternativa")
-			NIL)
-		((equal estrategia "sondagem.iterativa")
-			NIL)
-		((equal estrategia "ILDS")
-			NIL)
-		((equal estrategia "abordagem.alternativa")
-			(procura problema "profundidade"))))
+	(let ((solucao NIL))
+		(cond 
+			((equal estrategia "melhor-abordagem")
+				NIl)
+			((equal estrategia "a*.melhor.heuristica")
+				NIL)
+			((equal estrategia "a*.melhor.heuristica.alternativa")
+				NIL)
+			((equal estrategia "sondagem.iterativa")
+				NIL)
+			((equal estrategia "ILDS")
+				NIL)
+			((equal estrategia "abordagem.alternativa")
+				(setf solucao (car (last (car (procura problema "profundidade")))))))
+		(cons solucao (custo-estado solucao))))
