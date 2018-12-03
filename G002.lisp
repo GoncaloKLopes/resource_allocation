@@ -41,18 +41,14 @@
 ;(format t "~A ~%" turno)
 	(let ((num-pausas 0)
 		  (primeira-tarefa (car turno))
-		  (ultima-tarefa (last-turno turno))
-		  (duracao 0))
+		  (ultima-tarefa (last-turno turno)))
 
 		;;verifica se existem deslocacoes inicial e final a contabilizar para a duracao
 		(if (not (eq (nth 0 primeira-tarefa) +local-inicial+)) ;inicial
 			(setf num-pausas (1+ num-pausas)))
 		(if (not (eq (nth 1 ultima-tarefa) +local-inicial+)) ;final
 			(setf num-pausas (1+ num-pausas)))
-		(dolist (tarefa turno)
-			(setf duracao (+ duracao (duracao-tarefa tarefa))))
-		(setf duracao (+ duracao (* num-pausas +duracao-pausa+)))
-		(max +duracao-min-turno+ duracao)))
+		(+ (- (nth 3 ultima-tarefa) (nth 2 primeira-tarefa) (* num-pausas +duracao-pausa+)))))
 
 
 (defun duracao-conducao-turno (turno)
@@ -325,8 +321,7 @@
 	(setf problema (cria-problema (le-estado-inicial problema)
 								  (list #'operador)
 								  :objectivo? #'objectivo-p
-								  :custo #'custo-estado
-								  :heuristica #'n-turnos))
+								  :heuristica #'heuristica))
 	(let ((solucao NIL))
 		(cond 
 			((equal estrategia "melhor.abordagem")
