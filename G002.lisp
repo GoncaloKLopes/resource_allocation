@@ -1,4 +1,4 @@
-
+﻿
 (in-package :user)
 
 (defconstant +duracao-max-turno+ 480)
@@ -324,8 +324,23 @@
 	)
 
 
+(defun conta-pausas (turno)
+  (let ((primeiro (first turno))
+        (resto (rest turno))
+        (resultado 0))
+    (loop 
+      (if (null resto) (return))
+      (setf resultado (+ resultado (- (third (first resto)) (fourth primeiro))))
+      (setf primeiro (first resto))
+      (setf resto (rest resto)))resultado))
+
+(defun heuristica-alternativa (estado)
+  (let ((resultado 0))
+    (dolist (turno estado) (setf resultado (+ resultado (conta-pausas turno))))
+    (setf resultado (+ (list-length estado) (/ resultado 1000)))))
+
 (defun heuristica (estado)
-	(* estado 0))
+  (list-length estado))
 
 
 (defun le-estado-inicial (input)
