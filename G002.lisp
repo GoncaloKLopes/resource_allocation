@@ -22,7 +22,7 @@
 	 (car (last turno)))
 
 
-(defun duracao-tarefa (tarefa)
+(defun duracao-tarefa (tarefa )
 
 	"Calcula a duração de uma tarefa.
 
@@ -31,7 +31,7 @@
 	 Retorno:
 	 * Um inteiro que representa a duração da tarefa em minutos."
 
-	(max +duracao-min-turno+ (- (nth 3 tarefa) (nth 2 tarefa))))
+	(- (nth 3 tarefa) (nth 2 tarefa)))
 
 
 (defun duracao-total-turno (turno)
@@ -56,7 +56,7 @@
 		(dolist (tarefa turno)
 			(setf duracao (+ duracao (duracao-tarefa tarefa))))
 		(setf duracao (+ duracao (* num-pausas +duracao-pausa+)))
-		duracao))
+		(max +duracao-min-turno+ duracao)))
 
 (defun duracao-conducao-turno (turno)
 
@@ -91,7 +91,7 @@
 
 		(< (nth 2 tarefa2) (+ (nth 3 tarefa1) (* pausa? +duracao-pausa+)))))
 
-(defun cria-problema (input)
+(defun le-estado-inicial (input)
 
 	"Le um problema na sua representação externa e transforma-o para a sua
 	 representação interna, transformando cada tarefa num turno.
@@ -125,8 +125,8 @@
 			(let ((t1 (nth i turno))
 				  (t2 (nth (1+ i) turno)))
 				;(format t "t1= ~A  t2= ~A ~%" t1 t2)
-			    ;(format t "aux-vaga= ~A  ~%" (and (eq (nth 0 t2) (nth 1 t1))
-							; (>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+)))
+			  ;  (format t "aux-vaga= ~A  ~%" (and (eq (nth 0 t2) (nth 1 t1))
+							 					  ;(>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+)))
 				(if (or (and (eq (nth 0 t2) (nth 1 t1))
 							 (>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+));não é necessário um transporte.
 						(and (not (eq (nth 0 t2) (nth 1 t1)))
@@ -172,8 +172,8 @@
 
 	  	(let ((une? NIL))
 	  		;(format t "sobrepostas? ~A ~%" (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
-	  		;(format t "duracao= ~A ~%" (- tempo-inicio-t2 tempo-fim-t1))
-	  		;(format t "aux = ~A ~%" (tem-vaga-p turno1 T))
+	  		;(format t "duracao= ~A ~%" (- tempo-fim-t2 tempo-inicio-t1))
+	  		;(format t "aux = ~A ~%" (<= tempo-conducao-t1 +duracao-antes-refeicao+))
 			(if (and (<= (- tempo-fim-t2 tempo-inicio-t1) +duracao-max-turno+) ;tempototal < duracao max turno
 					 (not (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
 			         (or (and (> tempo-conducao-t1 +duracao-antes-refeicao+) ;tempo(t1) > 240
@@ -231,6 +231,52 @@
 	 					(progn
 	 						(setf novo-estado (append prefixo (append (list novo-turno) sufixo)))
 	 						;(format t "adicionando o estado ~A  ~%" novo-estado)
-	 						(setf novos-estados (append novos-estados (list novo-estado)))))))
+	 						(setf novos-estados (append novos-estados novo-estado))))))
 	 		(setf prefixo (append prefixo (list turno))))
 	 	novos-estados))
+
+
+(defun objectivo-p (estado)
+
+	"Testa se um estado é objectivo. Um estado é objectivo 
+	 se não puder gerar sucessores.
+
+	 Argumentos:
+	 * estado -- lista de turnos.
+	 Retorno:
+	 * T se for objectivo, NIL caso contrário."
+
+	 (null (operador estado)))
+
+(defun heuristica (estado)
+	0)
+
+(defun faz-afectacao (problema estrategia)
+
+	"Resolve um problema de afectação de recursos.
+
+	 Argumentos:
+	 * problema -- representação externa de um problema, uma lista de tarefas.
+	 * estrategia -- uma string que representa o nome da estratégia a usar.
+	 Retorno:
+	 * Melhor distribuição de tarefas obtida."
+
+	;;começar por transformar a lista de tarefas numa lista de turnos
+	(setf problema (cria-problema (le-estado-inicial problema)
+								  (list #'operador)
+								  :objectivo? (list #'objectivo-p)
+								  :custo (list #'duracao-total-turno)
+								  :heuristica (list #'heuristica)))
+	(cond 
+		((equal estrategia "melhor-abordagem")
+			NIl)
+		((equal estrategia "a*.melhor.heuristica")
+			NIL)
+		((equal estrategia "a*.melhor.heuristica.alternativa")
+			NIL)
+		((equal estrategia "sondagem.iterativa")
+			NIL)
+		((equal estrategia "ILDS")
+			NIL)
+		((equal estrategia "abordagem.alternativa")
+			(procura problema "profundidade"))))
