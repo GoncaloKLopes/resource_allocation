@@ -31,24 +31,29 @@
 	(- (nth 3 tarefa) (nth 2 tarefa)))
 
 
-(defun duracao-total-turno (turno)
 
-	"Calcula a duracao total de um turno, desde o inicio (contabilizando deslocacoes inicial e final).
+
+(defun duracao-total-turno (turno)
+		"Calcula a duracao total de um turno, desde o inicio (contabilizando deslocacoes inicial e final).
 	 Argumentos:
 	 * turno -- Lista de tarefas.
 	 Retorno:
 	 * A duracao do turno."
 ;(format t "~A ~%" turno)
-	(let ((num-pausas 0)
-		  (primeira-tarefa (car turno))
-		  (ultima-tarefa (last-turno turno)))
-
-		;;verifica se existem deslocacoes inicial e final a contabilizar para a duracao
-		(if (not (eq (nth 0 primeira-tarefa) +local-inicial+)) ;inicial
-			(setf num-pausas (1+ num-pausas)))
-		(if (not (eq (nth 1 ultima-tarefa) +local-inicial+)) ;final
-			(setf num-pausas (1+ num-pausas)))
-		(+ (- (nth 3 ultima-tarefa) (nth 2 primeira-tarefa) (* num-pausas +duracao-pausa+)))))
+  (let ((num-pausas 0)
+        (primeira-tarefa (car turno))
+        (ultima-tarefa (last-turno turno))
+        (tempoi-primeira-tarefa (nth 2 (car turno)))
+        (tempof-ultima-tarefa (nth 3 (last-turno turno))))
+    
+    ;;verifica se existem deslocacoes inicial e final a contabilizar para a duracao
+    (if (not (eq (nth 0 primeira-tarefa) +local-inicial+)) ;inicial
+        (setf tempoi-primeira-tarefa (- num-pausas +duracao-pausa+)))
+    (if (not (eq (nth 1 ultima-tarefa) +local-inicial+)) ;final
+        (setf tempof-ultima-tarefa (+ num-pausas +duracao-pausa+)))
+    (if (< (- tempof-ultima-tarefa tempoi-primeira-tarefa) +duracao-min-turno+) 
+        +duracao-min-turno+
+      (-  tempof-ultima-tarefa tempoi-primeira-tarefa))))
 
 
 (defun duracao-conducao-turno (turno)
