@@ -2,6 +2,7 @@
 (in-package :user)
 
 (defconstant +duracao-max-turno+ 480)
+(defconstant +duracao-min-turno+ 360)
 (defconstant +duracao-pausa+ 40)
 (defconstant +duracao-antes-refeicao+ 240)
 (defconstant +local-inicial+ 'L1)
@@ -30,7 +31,7 @@
 	 Retorno:
 	 * Um inteiro que representa a duração da tarefa em minutos."
 
-	(- (nth 3 tarefa) (nth 2 tarefa)))
+	(max +duracao-min-turno+ (- (nth 3 tarefa) (nth 2 tarefa))))
 
 
 (defun duracao-total-turno (turno)
@@ -52,8 +53,8 @@
 			(setf num-pausas (1+ num-pausas)))
 		(if (not (eq (nth 1 ultima-tarefa) +local-inicial+)) ;final
 			(setf num-pausas (1+ num-pausas)))
-
-		(setf duracao (- (nth 3 ultima-tarefa) (nth 2 primeira-tarefa)))
+		(dolist (tarefa turno)
+			(setf duracao (+ duracao (duracao-tarefa tarefa))))
 		(setf duracao (+ duracao (* num-pausas +duracao-pausa+)))
 		duracao))
 
@@ -144,64 +145,63 @@
 	 * Novo turno gerado de unir turno1 e turno2 se puderem ser unidos,
 	   NIL caso não seja possível."
 
-	(let ((primeira-tarefa-t1 (car turno1))
-			(ultima-tarefa-t1 (last-turno turno1))
-			(primeira-tarefa-t2 (car turno2))
-			(ultima-tarefa-t2 (last-turno turno2)))
-		(let
+	(let* ((primeira-tarefa-t1 (car turno1))
+		   (ultima-tarefa-t1 (last-turno turno1))
+		   (primeira-tarefa-t2 (car turno2))
+		   (ultima-tarefa-t2 (last-turno turno2))
 
-			((tempo-inicio-t1 (nth 2 primeira-tarefa-t1))
-			(tempo-inicio-t2 (nth 2 primeira-tarefa-t2))
-			(tempo-fim-t1 (nth 3 ultima-tarefa-t1))
-			(tempo-fim-t2 (nth 3 ultima-tarefa-t2))
+		   (tempo-inicio-t1 (nth 2 primeira-tarefa-t1))
+		   (tempo-inicio-t2 (nth 2 primeira-tarefa-t2))
+		   (tempo-fim-t1 (nth 3 ultima-tarefa-t1))
+		   (tempo-fim-t2 (nth 3 ultima-tarefa-t2))
 
-			(local-inicio-t1 (nth 0 primeira-tarefa-t1))
-			(local-inicio-t2 (nth 0 primeira-tarefa-t2))
-			(local-fim-t1 (nth 1 ultima-tarefa-t1))
-			(local-fim-t2 (nth 1 ultima-tarefa-t2))
+     	   (local-inicio-t1 (nth 0 primeira-tarefa-t1))
+		   (local-inicio-t2 (nth 0 primeira-tarefa-t2))
+		   (local-fim-t1 (nth 1 ultima-tarefa-t1))
+		   (local-fim-t2 (nth 1 ultima-tarefa-t2))
 
-			(tempo-conducao-t1 (duracao-conducao-turno turno1))
-			(tempo-conducao-t2 (duracao-conducao-turno turno2)))
-
-
-	(if (not (eq local-inicio-t1 +local-inicial+)) 
-		(setf tempo-inicio-t1 (- tempo-inicio-t1 +duracao-pausa+)))
-  
-  	(if (not (eq local-fim-t2 +local-inicial+)) 
-		(setf tempo-fim-t2 (+ tempo-fim-t2 +duracao-pausa+)))
-
-  	(let ((une? NIL))
-  		;(format t "sobrepostas? ~A ~%" (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
-  		;(format t "duracao= ~A ~%" (- tempo-inicio-t2 tempo-fim-t1))
-  		;(format t "aux = ~A ~%" (tem-vaga-p turno1 T))
-		(if (and (<= (- tempo-fim-t2 tempo-inicio-t1) +duracao-max-turno+) ;tempototal < duracao max turno
-				 (not (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
-		         (or (and (> tempo-conducao-t1 +duracao-antes-refeicao+) ;tempo(t1) > 240
-					      (<= tempo-conducao-t2 +duracao-antes-refeicao+)) ; tempo(t1) > 240 AND tempo(t2) <= 240 
-
-					 (and (> tempo-conducao-t2 +duracao-antes-refeicao+) ; tempo(t2) > 240
-		            	  (<= tempo-conducao-t1 +duracao-antes-refeicao+)) ; tempo(t1) <= 240 AND tempo(t2) > 240
-
- 					 (and (<= tempo-conducao-t1 +duracao-antes-refeicao+)
-					      (<= tempo-conducao-t2 +duracao-antes-refeicao+)
-					      (or (<= (+ tempo-conducao-t1 tempo-conducao-t2) +duracao-antes-refeicao+);tempo(t1) <= 240 AND tempo(t2) <= 240 AND tempo(t1) + tempo(t2) <= 240
-							  (and (> (+ tempo-conducao-t1 tempo-conducao-t2) +duracao-antes-refeicao+) ;tempo(t1) <= 240 AND tempo(t2) <= 240 AND tempo(t1) + tempo(t2) > 240
-							       (or (and (>= (- tempo-inicio-t2 tempo-fim-t1) +duracao-pausa+)
-									  	    (eq local-inicio-t2 local-fim-t1)) ;existe espaço entre os turnos para refeição?
-
-									   (and (>= (- tempo-inicio-t2 tempo-fim-t1) (* 2 +duracao-pausa+))
-									        (not (eq local-inicio-t2 local-fim-t1))) ;existe espaço entre os turnos para refeição e transporte?
-
-									   (tem-vaga-p turno1 T) 
-									   (tem-vaga-p turno2 NIL)))))))
-					(setf une? T))
-		(if une?
-			(append turno1 turno2)
-			NIL)))))
+		   (tempo-conducao-t1 (duracao-conducao-turno turno1))
+		   (tempo-conducao-t2 (duracao-conducao-turno turno2)))
 
 
+		(if (not (eq local-inicio-t1 +local-inicial+)) 
+			(setf tempo-inicio-t1 (- tempo-inicio-t1 +duracao-pausa+)))
+	  
+	  	(if (not (eq local-fim-t2 +local-inicial+)) 
+			(setf tempo-fim-t2 (+ tempo-fim-t2 +duracao-pausa+)))
 
-(defun gera-sucessores (estado)
+	  	(let ((une? NIL))
+	  		;(format t "sobrepostas? ~A ~%" (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
+	  		;(format t "duracao= ~A ~%" (- tempo-inicio-t2 tempo-fim-t1))
+	  		;(format t "aux = ~A ~%" (tem-vaga-p turno1 T))
+			(if (and (<= (- tempo-fim-t2 tempo-inicio-t1) +duracao-max-turno+) ;tempototal < duracao max turno
+					 (not (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
+			         (or (and (> tempo-conducao-t1 +duracao-antes-refeicao+) ;tempo(t1) > 240
+						      (<= tempo-conducao-t2 +duracao-antes-refeicao+)) ; tempo(t1) > 240 AND tempo(t2) <= 240 
+
+						 (and (> tempo-conducao-t2 +duracao-antes-refeicao+) ; tempo(t2) > 240
+			            	  (<= tempo-conducao-t1 +duracao-antes-refeicao+)) ; tempo(t1) <= 240 AND tempo(t2) > 240
+
+	 					 (and (<= tempo-conducao-t1 +duracao-antes-refeicao+)
+						      (<= tempo-conducao-t2 +duracao-antes-refeicao+)
+						      (or (<= (+ tempo-conducao-t1 tempo-conducao-t2) +duracao-antes-refeicao+);tempo(t1) <= 240 AND tempo(t2) <= 240 AND tempo(t1) + tempo(t2) <= 240
+								  (and (> (+ tempo-conducao-t1 tempo-conducao-t2) +duracao-antes-refeicao+) ;tempo(t1) <= 240 AND tempo(t2) <= 240 AND tempo(t1) + tempo(t2) > 240
+								       (or (and (>= (- tempo-inicio-t2 tempo-fim-t1) +duracao-pausa+)
+										  	    (eq local-inicio-t2 local-fim-t1)) ;existe espaço entre os turnos para refeição?
+
+										   (and (>= (- tempo-inicio-t2 tempo-fim-t1) (* 2 +duracao-pausa+))
+										        (not (eq local-inicio-t2 local-fim-t1))) ;existe espaço entre os turnos para refeição e transporte?
+
+										   (tem-vaga-p turno1 T) 
+										   (tem-vaga-p turno2 NIL)))))))
+						(setf une? T))
+			(if une?
+				(append turno1 turno2)
+				NIL))))
+
+
+
+(defun operador (estado)
 
 	"Gera a lista de sucessores dado um estado, em que cada sucessor
 	 consiste em 1 união de 2 turnos, mantendo-se os outros turnos iguais.

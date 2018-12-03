@@ -120,12 +120,12 @@
 	 * T se se sobrepuserem, NIL caso contrário."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|93 106 (DEFUN CRIA-PROBLEMA (INPUT) ...)-11|
+#Y(#:|93 107 (DEFUN CRIA-PROBLEMA (INPUT) ...)-11|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|CRIA-PROBLEMA| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|CRIA-PROBLEMA|
-       #37Y(00 00 00 00 01 00 00 00 26 02 63 AE 63 1B 0F 87 01 00 AE AD 7B 01
-            7B 01 82 02 23 02 83 01 AD 8D 9F 6D 00 19 05)
+       #39Y(00 00 00 00 01 00 00 00 26 02 63 AE 63 1B 0F 87 01 00 AE AD 7B 01
+            7B 01 82 02 23 02 83 01 AD 8D 9F 6D 16 02 15 19 02)
        () (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
        (|COMMON-LISP-USER|::|INPUT|)
        "Le um problema na sua representação externa e transforma-o para a sua\n
@@ -137,16 +137,16 @@
 	 * Lista de turnos correspondente ao estado inicial de um problema."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|109 130 (DEFUN TEM-VAGA-P (TURNO CONTRARIO?) ...)-12|
+#Y(#:|110 134 (DEFUN TEM-VAGA-P (TURNO CONTRARIO?) ...)-12|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|TEM-VAGA-P| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|TEM-VAGA-P|
-       #107Y(00 00 00 00 02 00 00 00 26 03 AE 72 62 72 B2 DA 1B 80 4C 16 03 1B
-             80 50 93 03 06 AD AD 82 01 38 00 AC B1 71 A1 96 01 B2 71 A1 94 00
-             9F 5C 5B 22 11 96 02 B3 71 A1 AF B4 71 A1 73 01 38 DB 90 01 34 51
-             94 00 9F 5C 5B 23 12 96 02 B3 71 A1 AF B4 71 A1 73 01 38 DC 90 01
-             34 FF B8 16 02 85 00 AC AE 91 01 34 FF B2 16 01 00 19 04)
-       (0. 80. 40.) (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
+       #107Y(00 00 00 00 02 00 00 00 26 03 AE 72 62 72 B2 DA 1B 80 4C 02 19 07
+             93 03 08 AD AD 73 01 38 81 B2 00 AC B1 71 A1 96 01 B2 71 A1 94 00
+             9F 5C 5B 23 11 9D 5C 5C 78 9F 5C 5C 5C 78 73 01 38 DB 90 01 34 51
+             94 00 9F 5C 5B 22 12 9D 5C 5C 78 9F 5C 5C 5C 78 73 01 38 DC 90 01
+             34 FF B8 16 02 85 00 AC AE 91 01 34 FF B0 16 02 00 19 03)
+       (0. 40. 80.) (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
        (|COMMON-LISP-USER|::|TURNO| |COMMON-LISP-USER|::|CONTRARIO?|)
        "Verifica se um turno tem espaço para refeição.\n\n
 	 Argumentos:\n
@@ -156,20 +156,20 @@
 	 * T se existir espaço para refeicão, NIl caso contrário."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
-#Y(#:|133 192 (DEFUN UNE-TURNOS (TURNO1 TURNO2) ...)-13|
+#Y(#:|137 199 (DEFUN UNE-TURNOS (TURNO1 TURNO2) ...)-13|
    #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
    (|COMMON-LISP-USER|::|UNE-TURNOS| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
     #Y(|COMMON-LISP-USER|::|UNE-TURNOS|
-       #209Y(00 00 00 00 02 00 00 00 26 03 94 02 AF 6F 00 94 03 B0 6F 00 A0 5C
-             5C 78 94 02 A1 5C 5C 5C 78 A0 5C 5C 5C 78 94 07 94 06 A5 5C 78 A4
-             5C 78 BA 6F 01 BA 6F 01 B1 24 02 06 DD B6 82 02 37 09 AE 24 02 06
-             DE B3 82 02 37 06 63 B3 B7 73 01 38 DF 91 01 33 80 74 B9 B9 8A 06
-             80 6E AE E1 91 01 32 07 AD E1 90 01 33 80 4E AD E1 91 01 32 07 AE
-             E1 90 01 33 80 41 AE E1 91 01 33 3B AD E1 91 01 33 35 AE AE 73 02
-             37 E1 90 01 33 2B AE AE 73 02 37 E1 91 01 32 21 B5 B5 73 01 38 DE
-             91 01 34 04 B1 A2 22 13 B5 B5 73 01 38 E2 91 01 34 04 B1 A2 23 05
-             BD 64 8B 09 0A 9D 1F 17 BD BD 33 02 23 19 12 BC 63 30 09 9D 1F 09
-             1B 70 7E 00 9D 1F 02 1B 69 19 12)
+       #208Y(00 00 00 00 02 00 00 00 26 03 94 02 AF 6F 00 94 03 B0 6F 00 A0 5C
+             5C 78 9F 5C 5C 78 A1 5C 5C 5C 78 A0 5C 5C 5C 78 94 07 94 06 A5 5C
+             78 A4 5C 78 BA 6F 01 BA 6F 01 B1 24 02 06 DD B6 82 02 37 09 AE 24
+             02 06 DE B3 82 02 37 06 63 B3 B7 73 01 38 DF 91 01 33 80 67 B9 B9
+             8A 06 80 61 AE E1 91 01 32 07 AD E1 90 01 33 80 5E AD E1 91 01 32
+             07 AE E1 90 01 33 80 51 AE E1 91 01 33 80 40 AD E1 91 01 33 3A AE
+             AE 73 02 37 E1 90 01 33 3A AE AE 73 02 37 E1 91 01 32 26 B5 B5 73
+             01 38 DE 91 01 34 04 B1 A2 22 22 B5 B5 73 01 38 E2 91 01 34 04 B1
+             A2 23 14 BD 64 8A 09 0F BC 63 8A 09 0A 9D 1F 0E BD BD 33 02 23 19
+             12 7E 00 9D 1F 02 1B 72 19 12)
        (|COMMON-LISP-USER|::|LAST-TURNO|
         |COMMON-LISP-USER|::|DURACAO-CONDUCAO-TURNO|
         #.|COMMON-LISP-USER|::|+LOCAL-INICIAL+| -40. 40. 480.
@@ -184,5 +184,24 @@
 	 Retorno:\n
 	 * Novo turno gerado de unir turno1 e turno2 se puderem ser unidos,\n
 	   NIL caso não seja possível."
+       1))
+   (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
+#Y(#:|203 235 (DEFUN GERA-SUCESSORES (ESTADO) ...)-14|
+   #20Y(00 00 00 00 00 00 00 00 20 01 DA 2F 01 DA DC 32 9C C5 19 01)
+   (|COMMON-LISP-USER|::|GERA-SUCESSORES| |SYSTEM|::|REMOVE-OLD-DEFINITIONS|
+    #Y(|COMMON-LISP-USER|::|GERA-SUCESSORES|
+       #81Y(00 00 00 00 01 00 00 00 26 02 63 AE 01 03 B2 63 1B 36 B1 AD 7B 01
+            B2 73 02 23 82 02 23 03 B3 B0 7B 01 82 02 23 07 16 01 1B 14 87 01
+            00 83 05 5C FB 93 05 0A AC 94 06 70 00 92 00 56 16 01 B0 AD 7B 01
+            82 02 23 04 83 01 AD 8D 9F 5E 16 02 A1 19 07)
+       (|COMMON-LISP-USER|::|UNE-TURNOS|)
+       (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|)
+       (|COMMON-LISP-USER|::|ESTADO|)
+       "Gera a lista de sucessores dado um estado, em que cada sucessor\n
+	 consiste em 1 união de 2 turnos, mantendo-se os outros turnos iguais.\n
+	 Argumentos:\n
+	 * estado -- lista de turnos.\n
+	 Retorno:\n
+	 * Lista de estados que representa os estados gerados."
        1))
    (|COMMON-LISP|::|T| |COMMON-LISP|::|T| |COMMON-LISP|::|T|))
