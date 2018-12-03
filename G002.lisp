@@ -223,6 +223,18 @@
 	 	novos-estados))
 
 
+(defun n-turnos (estado)
+
+	"Calcula o numero de turnos num estado.
+
+	 Argumentos:
+	 * estado -- lista de turnos.
+	 Retorno:
+	 * Inteiro que representa o número de turnos."
+
+ 	(length estado))
+
+
 (defun objectivo-p (estado)
 
 	"Testa se um estado é objectivo. Um estado é objectivo 
@@ -246,7 +258,7 @@
 	 Retorno:
 	 * Um turno que representa o custo do estado"
 
-	; (format t " cost ~A ~%" estado)
+	;(format t " cost ~A ~%" estado)
 	 (let ((duracao 0))
 	 	(dolist (turno estado)
 	 		(setf duracao (+ duracao (duracao-total-turno turno))))
@@ -254,7 +266,7 @@
 
 
 (defun heuristica (estado)
-	(* estado 0)
+	(* estado 0))
 
 
 (defun le-estado-inicial (input)
@@ -304,4 +316,4 @@
 				NIL)
 			((equal estrategia "abordagem.alternativa")
 				(setf solucao (car (last (car (procura problema "profundidade")))))))
-		(cons solucao (custo-estado solucao))))
+		(cons (cons solucao (custo-estado solucao)) (n-turnos solucao))))
