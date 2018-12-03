@@ -1,4 +1,3 @@
-﻿
 (in-package :user)
 
 (defconstant +duracao-max-turno+ 480)
@@ -10,12 +9,11 @@
 
 (defun last-turno (turno)
 
-	"A função last, quando aplicada a um turno, devolve uma lista com a tarefa. 
-	 Esta função last modificada devolve apenas a tarefa, em vez de uma lista 
+	"A funcao last, quando aplicada a um turno, devolve uma lista com a tarefa. 
+	 Esta funcao last modificada devolve apenas a tarefa, em vez de uma lista 
 	 com uma tarefa.
-
 	 Argumentos:
-	 * turno -- o turno do qual será obtida a última tarefa.
+	 * turno -- o turno do qual sera obtida a ultima tarefa.
 	 Retorno:
 	 * Uma lista de 4 elementos, correspondente a uma tarefa."
 
@@ -24,31 +22,29 @@
 
 (defun duracao-tarefa (tarefa )
 
-	"Calcula a duração de uma tarefa.
-
+	"Calcula a duracao de uma tarefa.
 	 Argumentos:
 	 * tarefa -- Lista de 4 elementos que representa uma tarefa.
 	 Retorno:
-	 * Um inteiro que representa a duração da tarefa em minutos."
+	 * Um inteiro que representa a duracao da tarefa em minutos."
 	 ;(format t "~A ~%" tarefa)
 	(- (nth 3 tarefa) (nth 2 tarefa)))
 
 
 (defun duracao-total-turno (turno)
 
-	"Calcula a duração total de um turno, desde o inicio (contabilizando deslocações inicial e final).
-
+	"Calcula a duracao total de um turno, desde o inicio (contabilizando deslocacoes inicial e final).
 	 Argumentos:
 	 * turno -- Lista de tarefas.
 	 Retorno:
-	 * A duração do turno."
+	 * A duracao do turno."
 ;(format t "~A ~%" turno)
 	(let ((num-pausas 0)
 		  (primeira-tarefa (car turno))
 		  (ultima-tarefa (last-turno turno))
 		  (duracao 0))
 
-		;;verifica se existem deslocações inicial e final a contabilizar para a duração
+		;;verifica se existem deslocacoes inicial e final a contabilizar para a duracao
 		(if (not (eq (nth 0 primeira-tarefa) +local-inicial+)) ;inicial
 			(setf num-pausas (1+ num-pausas)))
 		(if (not (eq (nth 1 ultima-tarefa) +local-inicial+)) ;final
@@ -61,12 +57,11 @@
 
 (defun duracao-conducao-turno (turno)
 
-	"Calcula a duração total de condução um turno.
-
+	"Calcula a duracao total de conducao um turno.
 	 Argumentos:
 	 * turno -- Lista de tarefas.
 	 Retorno:
-	 * A duração de condução feita num turno."	
+	 * A duracao de conducao feita num turno."	
 
 	(let ((duracao 0))
 		(dolist (tarefa turno)
@@ -77,16 +72,15 @@
 (defun tarefas-sobrepostas-p (tarefa1 tarefa2)
 
 	"Predicado que verifica se duas tarefas se sobrepoem.
-
 	 Argumentos:
 	 * tarefa1 -- Lista de 4 ou 1 elemento(s).
 	 * tarefa2 -- Lista de 4 ou 1 elemento(s).
 	 Retorno:
-	 * T se se sobrepuserem, NIL caso contrário."
+	 * T se se sobrepuserem, NIL caso contrario."
 	 ;(format t "~A ~A ~%" tarefa1 tarefa2)
-	;;se for necessaria uma pausa para deslocação entre as duas tarefas 
+	;;se for necessaria uma pausa para deslocacao entre as duas tarefas 
 	;;deve ser contabilizado esse tempo extra
-	(let ((pausa? 0)) ;0 ou 1 em vez de booleano para poder ser usado na multiplicação
+	(let ((pausa? 0)) ;0 ou 1 em vez de booleano para poder ser usado na multiplicacao
 		(if (not (eq (nth 1 tarefa1) (nth 0 tarefa2)))
 			(setf pausa? 1))
 
@@ -95,14 +89,13 @@
 
 (defun tem-vaga-p (turno contrario? limite)
 
-	"Verifica se um turno tem espaço para refeição.
-
+	"Verifica se um turno tem espaco para refeicao.
 	 Argumentos:
 	 * turno -- lista de tarefas.
-	 * contrario? -- T o início ao fim, NIL caso contrário
+	 * contrario? -- T o início ao fim, NIL caso contrario
 	 * limite -- 
 	 Retorno:
-	 * T se existir espaço para refeicão, NIl caso contrário."
+	 * T se existir espaco para refeicao, NIl caso contrario."
 
 	(let ((tamanho (1- (length turno))))
 		(dotimes (i tamanho)
@@ -123,22 +116,22 @@
 					(return-from tem-vaga-p NIL))
 
 				(if (or (and (eq (nth 0 t2) (nth 1 t1))
-							 (>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+));não é necessário um transporte.
+							 (>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+));nao e necessario um transporte.
 						(and (not (eq (nth 0 t2) (nth 1 t1)))
-							 (>= (- (nth 2 t2) (nth 3 t1)) (* 2 +duracao-pausa+)))) ;é necessario fazer um transporte? 
+							 (>= (- (nth 2 t2) (nth 3 t1)) (* 2 +duracao-pausa+)))) ;e necessario fazer um transporte? 
 					(return-from tem-vaga-p T)))))
 	NIL)
 
 
 (defun une-turnos (turno1 turno2)
 
-	"Une dois turnos, tendo em conta as restrições impostas.
+	"Une dois turnos, tendo em conta as restricoes impostas.
 	 Argumentos:
 	 * turno1 -- Lista de tarefas.
 	 * turno2 -- Lista de tarefas.
 	 Retorno:
 	 * Novo turno gerado de unir turno1 e turno2 se puderem ser unidos,
-	   NIL caso não seja possível."
+	   NIL caso nao seja possível."
 
 	;(format t "uniao ~A ~A ~%" turno1 turno2)
 	(let* ((primeira-tarefa-t1 (car turno1))
@@ -183,10 +176,10 @@
 						      (or (<= (+ tempo-conducao-t1 tempo-conducao-t2) +duracao-antes-refeicao+);tempo(t1) <= 240 AND tempo(t2) <= 240 AND tempo(t1) + tempo(t2) <= 240
 								  (and (> (+ tempo-conducao-t1 tempo-conducao-t2) +duracao-antes-refeicao+) ;tempo(t1) <= 240 AND tempo(t2) <= 240 AND tempo(t1) + tempo(t2) > 240
 								       (or (and (>= (- tempo-inicio-t2 tempo-fim-t1) +duracao-pausa+)
-										  	    (eq local-inicio-t2 local-fim-t1)) ;existe espaço entre os turnos para refeição?
+										  	    (eq local-inicio-t2 local-fim-t1)) ;existe espaco entre os turnos para refeicao?
 
 										   (and (>= (- tempo-inicio-t2 tempo-fim-t1) (* 2 +duracao-pausa+))
-										        (not (eq local-inicio-t2 local-fim-t1))) ;existe espaço entre os turnos para refeição e transporte?
+										        (not (eq local-inicio-t2 local-fim-t1))) ;existe espaco entre os turnos para refeicao e transporte?
 
 										   (tem-vaga-p turno1 T tempo-fim-t2) 
 										   (tem-vaga-p turno2 NIL tempo-inicio-t1)))))))
@@ -216,7 +209,7 @@
 (defun operador (estado)
 
 	"Gera a lista de sucessores dado um estado, em que cada sucessor
-	 consiste em 1 união de 2 turnos, mantendo-se os outros turnos iguais.
+	 consiste em 1 uniao de 2 turnos, mantendo-se os outros turnos iguais.
 	 Argumentos:
 	 * estado -- lista de turnos.
 	 Retorno:
@@ -243,55 +236,27 @@
                (setf resto (rest resto))
                (setf resto-aux resto)
                (setf j (1+ i))))))resultado))
-#|
-	 ;(format t "~% ~% BIIIIG BOOOOYYYYYY ~A ~% ~%" estado)
-	 (let ((novos-estados '())
-	 	   (estado-restante estado)
-	 	   ;; prefixo e sufixo para adicionar antes e depois de cada novo turno gerado.
-	 	   (prefixo '())
-	 	   (sufixo '())
-	 	   (novo-estado '()))
-	 	(dolist (turno estado)
-	 		;(format t "### ~A #### ~%" turno)
-	 		;(format t "novos-estados: ~A ~%" novos-estados)
-
-	 		(setf estado-restante (cdr estado-restante))
-	 		(setf sufixo (cdr estado-restante))
-	 		;(format t "o que falta ~A ~%" estado-restante)
-
-	 		(if (not (NULL estado-restante))
-	 			(let ((novo-turno (une-turnos turno (car estado-restante))))
-	 				;(format t "turno possível: ~A  ~%" novo-turno)
-	 				(if (not (null novo-turno))
-	 					(progn
-	 						(setf novo-estado (append prefixo (append (list novo-turno) sufixo)))
-	 						;(format t "adicionando o estado ~A  ~%" novo-estado)
-	 						(setf novos-estados (append novos-estados (list novo-estado)))))))
-	 		(setf prefixo (append prefixo (list turno))))
-	 	novos-estados))|#
 
 
 (defun n-turnos (estado)
 
 	"Calcula o numero de turnos num estado.
-
 	 Argumentos:
 	 * estado -- lista de turnos.
 	 Retorno:
-	 * Inteiro que representa o número de turnos."
+	 * Inteiro que representa o numero de turnos."
 
  	(length estado))
 
 
 (defun objectivo-p (estado)
 
-	"Testa se um estado é objectivo. Um estado é objectivo 
-	 se não puder gerar sucessores.
-
+	"Testa se um estado e objectivo. Um estado e objectivo 
+	 se nao puder gerar sucessores.
 	 Argumentos:
 	 * estado -- lista de turnos.
 	 Retorno:
-	 * T se for objectivo, NIL caso contrário."
+	 * T se for objectivo, NIL caso contrario."
 
 	 (null (operador estado)))
 
@@ -299,8 +264,7 @@
 (defun custo-estado (estado)
 	
 	"Calcula um custo de um estado, correspondente
-	 à soma dos custos de cada turno.
-
+	 a soma dos custos de cada turno.
 	 Argumentos:
 	 * estado -- lista de turnos.
 	 Retorno:
@@ -311,17 +275,6 @@
 	 	(dolist (turno estado)
 	 		(setf duracao (+ duracao (duracao-total-turno turno))))
 	 	duracao))
-
-(defun tempo-sem-tarefa (estado)
-
-	"Calcula a soma dos tempos entre as tarefas de cada turno.
-
-	 Argumentos:
-	 * estado -- lista de turnos.
-	 Retorno:
-	 * Um inteiro que representa a soma dos tempos entre tarefas"
-
-	)
 
 
 (defun conta-pausas (turno)
@@ -345,12 +298,11 @@
 
 (defun le-estado-inicial (input)
 
-	"Le um problema na sua representação externa e transforma-o para a sua
-	 representação interna, transformando cada tarefa num turno.
-
+	"Le um problema na sua representacao externa e transforma-o para a sua
+	 representacao interna, transformando cada tarefa num turno.
 	 Argumentos:
-	 * input-- lista de tarefas correspondente à 
-	               representação externa de um problema a resolver.
+	 * input-- lista de tarefas correspondente a 
+	               representacao externa de um problema a resolver.
 	 Retorno:
 	 * Lista de turnos correspondente ao estado inicial de um problema."
 
@@ -362,15 +314,14 @@
 
 (defun faz-afectacao (problema estrategia)
 
-	"Resolve um problema de afectação de recursos.
-
+	"Resolve um problema de afectacao de recursos.
 	 Argumentos:
-	 * problema -- representação externa de um problema, uma lista de tarefas.
-	 * estrategia -- uma string que representa o nome da estratégia a usar.
+	 * problema -- representacao externa de um problema, uma lista de tarefas.
+	 * estrategia -- uma string que representa o nome da estrategia a usar.
 	 Retorno:
-	 * Melhor distribuição de tarefas obtida."
+	 * Melhor distribuicao de tarefas obtida."
 
-	;;começar por transformar a lista de tarefas numa lista de turnos
+	;;comecar por transformar a lista de tarefas numa lista de turnos
 	(setf problema (cria-problema (le-estado-inicial problema)
 								  (list #'operador)
 								  :objectivo? #'objectivo-p
