@@ -245,8 +245,8 @@
 	 * estado -- lista de turnos.
 	 Retorno:
 	 * Um turno que representa o custo do estado"
-	 
-	 (format t " cost ~A ~%" estado)
+
+	; (format t " cost ~A ~%" estado)
 	 (let ((duracao 0))
 	 	(dolist (turno estado)
 	 		(setf duracao (+ duracao (duracao-total-turno turno))))
@@ -254,8 +254,7 @@
 
 
 (defun heuristica (estado)
-
-	0)
+	(* estado 0)
 
 
 (defun le-estado-inicial (input)
@@ -293,7 +292,7 @@
 								  :heuristica #'heuristica))
 	(let ((solucao NIL))
 		(cond 
-			((equal estrategia "melhor-abordagem")
+			((equal estrategia "melhor.abordagem")
 				NIl)
 			((equal estrategia "a*.melhor.heuristica")
 				NIL)
