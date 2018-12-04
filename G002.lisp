@@ -125,6 +125,51 @@
 	NIL)
 
 
+(defun tem-vaga-t1 (turno1 t2f)
+  (let* ((turno (reverse turno1))
+         (primeiro (first turno))
+         (resto (rest turno))
+         (segundo (first resto))
+         (pausas 0))
+        
+    (loop
+      
+      (if (> (- t2f (third primeiro)) +duracao-antes-refeicao+)
+          (return nil))     
+      (if (equal (first primeiro) (second segundo))
+          (setf pausas (+ pausas +duracao-pausa+))
+        (setf pausas (+ pausas (* 2 +duracao-pausa+))))
+      (if (>= (- (third primeiro) (fourth segundo) pausas) 0)
+          (return T))
+        
+      (setf primeiro (first resto))
+      (setf resto (rest resto))
+      (setf segundo (first resto))
+      (setf pausas 0))))
+
+
+(defun tem-vaga-t2 (turno t1i)
+  (let* ((primeiro (first turno))
+         (resto (rest turno))
+         (segundo (first resto))
+         (pausas 0))
+    
+    (loop
+      
+      (if (equal (second primeiro) (first segundo))
+          (setf pausas (+ pausas +duracao-pausa+))
+        (setf pausas (+ pausas (* 2 +duracao-pausa+))))
+      (if (> (- (fourth primeiro) t1i) (- +duracao-antes-refeicao+ pausas))
+          (return nil))
+      (if (>= (- (third segundo) (fourth primeiro) pausas) 0)
+          (return T))
+      
+      (setf primeiro (first resto))
+      (setf resto (rest resto))
+      (setf segundo (first resto))
+      (setf pausas 0))))
+
+
 (defun turnos-unificaveis-p (turno1 turno2)
 
 	"Une dois turnos, tendo em conta as restricoes impostas.
