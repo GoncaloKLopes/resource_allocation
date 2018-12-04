@@ -17,17 +17,16 @@
 					&key (duracao-total NIL)
 					(duracao-conducao NIL))
 	(if (null duracao-total)
-		(let ((num-pausas 0)
-		       (primeira-tarefa (car tarefas))
+		(let ((primeira-tarefa (car tarefas))
 		       (ultima-tarefa (car (last tarefas)))
 		       (tempoi-primeira-tarefa (nth 2 (car tarefas)))
 		       (tempof-ultima-tarefa (nth 3 (car (last tarefas)))))
 		    
 		    ;;verifica se existem deslocacoes inicial e final a contabilizar para a duracao
 		    (if (not (eq (nth 0 primeira-tarefa) +local-inicial+)) ;inicial
-		        (setf tempoi-primeira-tarefa (- num-pausas +duracao-pausa+)))
+		        (setf tempoi-primeira-tarefa (- tempoi-primeira-tarefa +duracao-pausa+)))
 		    (if (not (eq (nth 1 ultima-tarefa) +local-inicial+)) ;final
-		        (setf tempof-ultima-tarefa (+ num-pausas +duracao-pausa+)))
+		        (setf tempof-ultima-tarefa (+ tempof-ultima-tarefa +duracao-pausa+)))
 
 		    (setf duracao-total (max +duracao-min-turno+ (-  tempof-ultima-tarefa tempoi-primeira-tarefa)))))
 
