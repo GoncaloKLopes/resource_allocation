@@ -16,25 +16,26 @@
 (defun cria-turno (tarefas
 					&key (duracao-total NIL)
 					(duracao-conducao NIL))
-
 	(if (null duracao-total)
 		(let ((num-pausas 0)
-			  (primeira-tarefa (car tarefas))
-			  (ultima-tarefa (car (last tarefas))))
+		       (primeira-tarefa (car tarefas))
+		       (ultima-tarefa (car (last tarefas)))
+		       (tempoi-primeira-tarefa (nth 2 (car tarefas)))
+		       (tempof-ultima-tarefa (nth 3 (car (last tarefas)))))
+		    
+		    ;;verifica se existem deslocacoes inicial e final a contabilizar para a duracao
+		    (if (not (eq (nth 0 primeira-tarefa) +local-inicial+)) ;inicial
+		        (setf tempoi-primeira-tarefa (- num-pausas +duracao-pausa+)))
+		    (if (not (eq (nth 1 ultima-tarefa) +local-inicial+)) ;final
+		        (setf tempof-ultima-tarefa (+ num-pausas +duracao-pausa+)))
 
-			;;verifica se existem deslocacoes inicial e final a contabilizar para a duracao
-			(if (not (eq (nth 0 primeira-tarefa) +local-inicial+)) ;inicial
-				(setf num-pausas (1+ num-pausas)))
-			(if (not (eq (nth 1 ultima-tarefa) +local-inicial+)) ;final
-				(setf num-pausas (1+ num-pausas)))
-			(setf duracao-total (+ (- (nth 3 ultima-tarefa) (nth 2 primeira-tarefa)) (* num-pausas +duracao-pausa+)))))
+		    (setf duracao-total (max +duracao-min-turno+ (-  tempof-ultima-tarefa tempoi-primeira-tarefa)))))
 
 	(if (null duracao-conducao)
 		(progn
 			(setf duracao-conducao 0)
 			(dolist (tarefa tarefas)
 				(setf duracao-conducao (+ duracao-conducao (tarefa-calcula-duracao tarefa))))))
-
 	(make-turno
 		:tarefas tarefas
 		:duracao-total duracao-total
@@ -61,6 +62,20 @@
 	 Retorno:
 	 * Um inteiro que representa a duracao da tarefa em minutos."
 	(- (nth 3 tarefa) (nth 2 tarefa)))
+
+
+(defun duracao-conducao-turno (turno)
+
+	"Calcula a duracao total de conducao um turno.
+	 Argumentos:
+	 * turno -- Lista de tarefas.
+	 Retorno:
+	 * A duracao de conducao feita num turno."	
+
+	(let ((duracao 0))
+		(dolist (tarefa turno)
+			(setf duracao (+ duracao (duracao-tarefa tarefa))))
+		duracao))
 
 
 (defun tarefas-sobrepostas-p (tarefa1 tarefa2)
@@ -359,4 +374,3 @@
 		(setf tempo (nth 1 solucao))
 		(setf solucao (car (last (car solucao))))
 		(cons (cons (cons solucao (custo-estado solucao)) (n-turnos solucao)) (float (/ tempo internal-time-units-per-second)))))
-		
