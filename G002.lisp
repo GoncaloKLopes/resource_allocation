@@ -1,10 +1,17 @@
 (in-package :user)
 
+(compile-file "procura.lisp")
+(load "procura")
+(load "turnos-teste")
+
+(defconstant +max-tempo-execucao+ 250) ;5segundos de seguranca..
 (defconstant +duracao-max-turno+ 480)
 (defconstant +duracao-min-turno+ 360)
 (defconstant +duracao-pausa+ 40)
 (defconstant +duracao-antes-refeicao+ 240)
 (defconstant +local-inicial+ 'L1)
+
+(defvar *tempo-execucao-inicial* (get-universal-time))
 
 
 (defstruct turno
@@ -61,20 +68,6 @@
 	 Retorno:
 	 * Um inteiro que representa a duracao da tarefa em minutos."
 	(- (nth 3 tarefa) (nth 2 tarefa)))
-
-
-(defun duracao-conducao-turno (turno)
-
-	"Calcula a duracao total de conducao um turno.
-	 Argumentos:
-	 * turno -- Lista de tarefas.
-	 Retorno:
-	 * A duracao de conducao feita num turno."	
-
-	(let ((duracao 0))
-		(dolist (tarefa turno)
-			(setf duracao (+ duracao (duracao-tarefa tarefa))))
-		duracao))
 
 
 (defun tarefas-sobrepostas-p (tarefa1 tarefa2)
@@ -280,7 +273,8 @@
 	 * estado -- lista de turnos.
 	 Retorno:
 	 * T se for objectivo, NIL caso contrario."
-	 (null (operador estado)))
+	(or (null (operador estado))
+		(>= (- (get-universal-time) *tempo-execucao-inicial*) +max-tempo-execucao+)))
 
 
 (defun custo-estado (estado)
@@ -343,6 +337,8 @@
 	 * Melhor distribuicao de tarefas obtida."
 
 	;;comecar por transformar a lista de tarefas numa lista de turnos
+
+	(setf *tempo-execucao-inicial* (get-universal-time))
 	(let ((solucao NIL)
 		  (tempo 0)
 		  (funcao-heuristica NIL))
