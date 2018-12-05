@@ -375,7 +375,7 @@
 	 * Lista de turnos correspondente ao estado inicial de um problema."
 
   (let ((problema '()))
-    (dolist (i input)
+    (dolist (i (sort input #'< :key #'third))
 		(let ((novo-turno (cria-turno (list i))))
 
       		(setf problema (append problema (list novo-turno)))))
