@@ -126,7 +126,7 @@
 
 
 (defun tem-vaga-t1 (turno1 t2f)
-  (let* ((turno (reverse turno1))
+  (let* ((turno (reverse (turno-tarefas turno1)))
          (primeiro (first turno))
          (resto (rest turno))
          (segundo (first resto))
@@ -149,7 +149,8 @@
 
 
 (defun tem-vaga-t2 (turno t1i)
-  (let* ((primeiro (first turno))
+  (let* ((turno (turno-tarefas turno))
+  	     (primeiro (first turno))
          (resto (rest turno))
          (segundo (first resto))
          (pausas 0))
@@ -231,8 +232,8 @@
 										   (and (>= (- tempo-inicio-t2 tempo-fim-t1) (* 2 +duracao-pausa+))
 										        (not (eq local-inicio-t2 local-fim-t1))) ;existe espaco entre os turnos para refeicao e transporte?
 
-										   (tem-vaga-p turno1 T tempo-fim-t2) 
-										   (tem-vaga-p turno2 NIL tempo-inicio-t1)))))))
+										   (tem-vaga-t1 turno1 tempo-fim-t2) 
+										   (tem-vaga-t2 turno2 tempo-inicio-t1)))))))
 						(setf une? T))
 			
 			une?)))
@@ -398,6 +399,16 @@
 				(return-from sondagem-iterativa melhor-solucao))
 
 			(setf estado-actual estado-inicial))))
+#|
+(defun ilds (problema)
+
+	"Utiliza a estrategia ILDS para resolver um problema de procura.
+	 Argumentos:
+	 * problema -- struct de representacao de um problema.
+	 Retorno:
+	 * O estado final obtido."
+	(flet ((ilds-iter (estado, k, profundidade)))
+	) |#
 
 
 (defun calcula-tempo-execucao ()
