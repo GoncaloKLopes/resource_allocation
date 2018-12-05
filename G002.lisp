@@ -13,6 +13,48 @@
 
 (defvar *tempo-execucao-inicial* (get-internal-run-time))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; Funcoes auxiliares
+;;;
+
+(defun remove-nth (n list)
+
+	"Remove o n-esimo elemento de uma lista.
+
+	 Argumentos:
+	 * n -- o indice do elemento a remover.
+	 * list -- a lista a modificar.
+	 Returno:
+	 * A lista sem o n-esimo elemento"
+
+  (declare
+    (type (integer 0) n)
+    (type list list))
+  (if (or (zerop n) (null list))
+    (cdr list)
+    (cons (car list) (remove-nth (1- n) (cdr list)))))
+
+
+(defun calcula-tempo-execucao ()
+
+	"Calcula o tempo de execucao do programa.
+
+	 Retorno:
+	 * O tempo de execucao desde o inicio do programa em segundos."
+
+	(float (/ (- (get-internal-run-time) *tempo-execucao-inicial*) internal-time-units-per-second)))
+
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; Definicao da estrutura que representa um turno
+;;; e funcoes auxiliares de acesso a elementos da estrutura
+;;; e criacao da mesma
+;;;
 
 (defstruct turno
 	tarefas
@@ -58,72 +100,6 @@
 	 * Uma lista de 4 elementos, correspondente a uma tarefa."
 
 	 (car (last (turno-tarefas turno))))
-
-
-(defun tarefa-calcula-duracao (tarefa)
-
-	"Calcula a duracao de uma tarefa.
-	 Argumentos:
-	 * tarefa -- Lista de 4 elementos que representa uma tarefa.
-	 Retorno:
-	 * Um inteiro que representa a duracao da tarefa em minutos."
-	(- (nth 3 tarefa) (nth 2 tarefa)))
-
-
-(defun tarefas-sobrepostas-p (tarefa1 tarefa2)
-
-	"Predicado que verifica se duas tarefas se sobrepoem.
-	 Argumentos:
-	 * tarefa1 -- Lista de 4 elementos.
-	 * tarefa2 -- Lista de 4 elementos.
-	 Retorno:
-	 * T se se sobrepuserem, NIL caso contrario."
-	 ;(format t "~A ~A ~%" tarefa1 tarefa2)
-	;;se for necessaria uma pausa para deslocacao entre as duas tarefas 
-	;;deve ser contabilizado esse tempo extra
-	(let ((pausa? 0)) ;0 ou 1 em vez de booleano para poder ser usado na multiplicacao
-		(if (not (eq (nth 1 tarefa1) (nth 0 tarefa2)))
-			(setf pausa? 1))
-
-		(< (nth 2 tarefa2) (+ (nth 3 tarefa1) (* pausa? +duracao-pausa+)))))
-
-
-(defun tem-vaga-p (turno contrario? limite)
-
-	"Verifica se um turno tem espaco para refeicao.
-	 Argumentos:
-	 * turno -- lista de tarefas.
-	 * contrario? -- T o início ao fim, NIL caso contrario
-	 * limite -- 
-	 Retorno:
-	 * T se existir espaco para refeicao, NIl caso contrario."
-
-	(setf turno (turno-tarefas turno))
-	(let ((tamanho (1- (length turno))))
-		(dotimes (i tamanho)
-			(if contrario? 
-				(setf i (1- (- tamanho i))))
-			(let ((t1 (nth i turno))
-				  (t2 (nth (1+ i) turno)))
-				;(format t "t1= ~A  t2= ~A ~%" t1 t2)
-			    ;(format t "aux-vaga= ~A  ~%" (and (eq (nth 0 t2) (nth 1 t1))
-							 					  ;(>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+)))
-				(if (or (and contrario?
-						     (> (- limite (nth 2 t1)) +duracao-antes-refeicao+))
-						(and (not contrario?)
-							 (or (and (not (eq (nth 1 t1) (nth 0 t2)))
-							 		  (> (- (nth 3 t1) limite) (- +duracao-antes-refeicao+ (* 2 +duracao-pausa+)))) 
-							 	 (and (eq (nth 1 t1) (nth 0 t2))
-							 	 	  (> (- (nth 3 t1) limite) (- +duracao-antes-refeicao+ +duracao-pausa+))))))
-					(return-from tem-vaga-p NIL))
-
-				(if (or (and (eq (nth 0 t2) (nth 1 t1))
-							 (>= (- (nth 2 t2) (nth 3 t1)) +duracao-pausa+));nao e necessario um transporte.
-						(and (not (eq (nth 0 t2) (nth 1 t1)))
-							 (>= (- (nth 2 t2) (nth 3 t1)) (* 2 +duracao-pausa+)))) ;e necessario fazer um transporte? 
-					(return-from tem-vaga-p T)))))
-	NIL)
-
 
 (defun tem-vaga-t1 (turno1 t2f)
   (let* ((turno (reverse (turno-tarefas turno1)))
@@ -251,22 +227,65 @@
 			(setf novas-tarefas (append novas-tarefas (turno-tarefas (nth index2 novo-estado))))
 
 			(setf (nth index1 novo-estado) (cria-turno novas-tarefas :duracao-conducao nova-duracao-conducao))
-;;;;
 
 			(setf novo-estado (remove-nth index2 novo-estado)))
 
 			novo-estado))))
 
+(defun conta-pausas (turno)
+  (let ((primeiro (first (turno-tarefas turno)))
+        (resto (rest (turno-tarefas turno)))
+        (resultado 0))
+    (loop 
+      (if (null resto) (return))
+      (setf resultado (+ resultado (- (third (first resto)) (fourth primeiro))))
+      (setf primeiro (first resto))
+      (setf resto (rest resto)))resultado))
 
-(defun remove-nth (n list)
-  (declare
-    (type (integer 0) n)
-    (type list list))
-  (if (or (zerop n) (null list))
-    (cdr list)
-    (cons (car list) (remove-nth (1- n) (cdr list)))))
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; Funcoes que operam sobre tarefas
+;;;
+
+(defun tarefa-calcula-duracao (tarefa)
+
+	"Calcula a duracao de uma tarefa.
+	 Argumentos:
+	 * tarefa -- Lista de 4 elementos que representa uma tarefa.
+	 Retorno:
+	 * Um inteiro que representa a duracao da tarefa em minutos."
+	(- (nth 3 tarefa) (nth 2 tarefa)))
+
+
+(defun tarefas-sobrepostas-p (tarefa1 tarefa2)
+
+	"Predicado que verifica se duas tarefas se sobrepoem.
+	 Argumentos:
+	 * tarefa1 -- Lista de 4 elementos.
+	 * tarefa2 -- Lista de 4 elementos.
+	 Retorno:
+	 * T se se sobrepuserem, NIL caso contrario."
+	 ;(format t "~A ~A ~%" tarefa1 tarefa2)
+	;;se for necessaria uma pausa para deslocacao entre as duas tarefas 
+	;;deve ser contabilizado esse tempo extra
+	(let ((pausa? 0)) ;0 ou 1 em vez de booleano para poder ser usado na multiplicacao
+		(if (not (eq (nth 1 tarefa1) (nth 0 tarefa2)))
+			(setf pausa? 1))
+
+		(< (nth 2 tarefa2) (+ (nth 3 tarefa1) (* pausa? +duracao-pausa+)))))
+
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; Funcoes que operam sobre estados
+;;;
 
 (defun operador (estado)
 
@@ -339,16 +358,6 @@
 	 	duracao))
 
 
-(defun conta-pausas (turno)
-  (let ((primeiro (first (turno-tarefas turno)))
-        (resto (rest (turno-tarefas turno)))
-        (resultado 0))
-    (loop 
-      (if (null resto) (return))
-      (setf resultado (+ resultado (- (third (first resto)) (fourth primeiro))))
-      (setf primeiro (first resto))
-      (setf resto (rest resto)))resultado))
-
 (defun heuristica-alternativa (estado)
   (let ((resultado 0))
     (dolist (turno estado) (setf resultado (+ resultado (conta-pausas turno))))
@@ -371,6 +380,15 @@
 
       		(setf problema (append problema (list novo-turno)))))
   	problema))
+
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;; Estrategias de procura implementadas
+;;;
 
 (defun sondagem-iterativa (problema)
 
@@ -410,16 +428,25 @@
 	(flet ((ilds-iter (estado, k, profundidade)))
 	) |#
 
+(defun genetico (problema)
 
-(defun calcula-tempo-execucao ()
-
-	"Calcula o tempo de execucao do programa.
-
+	"Utiliza procura genetica para resolver um problema de procura.
+	 Argumentos:
+	 * problema -- struct de representacao de um problema.
 	 Retorno:
-	 * O tempo de execucao desde o inicio do programa em segundos."
+	 * O estado final obtido."
 
-	(float (/ (- (get-internal-run-time) *tempo-execucao-inicial*) internal-time-units-per-second)))
 
+	)
+
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+;;;
+;;;		Funcao Principal
+;;;
 
 (defun faz-afectacao (problema estrategia)
 
