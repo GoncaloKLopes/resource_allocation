@@ -4,14 +4,14 @@
 (load "procura")
 (load "turnos-teste")
 
-(defconstant +max-tempo-execucao+ 250) ;5segundos de seguranca..
+(defconstant +max-tempo-execucao+ 295) ;5segundos de seguranca.. (295 default)
 (defconstant +duracao-max-turno+ 480)
 (defconstant +duracao-min-turno+ 360)
 (defconstant +duracao-pausa+ 40)
 (defconstant +duracao-antes-refeicao+ 240)
 (defconstant +local-inicial+ 'L1)
 
-(defvar *tempo-execucao-inicial* (get-universal-time))
+(defvar *tempo-execucao-inicial* (get-internal-run-time))
 
 
 (defstruct turno
@@ -319,7 +319,7 @@
 	 Retorno:
 	 * T se for objectivo, NIL caso contrario."
 	(or (null (operador estado))
-		(>= (- (get-universal-time) *tempo-execucao-inicial*) +max-tempo-execucao+)))
+		(>= (calcula-tempo-execucao) +max-tempo-execucao+)))
 
 
 (defun custo-estado (estado)
@@ -371,6 +371,44 @@
       		(setf problema (append problema (list novo-turno)))))
   	problema))
 
+(defun sondagem-iterativa (problema)
+
+	"Utiliza a estrategia de songagem iterativa para resolver um problema de procura.
+	 Argumentos:
+	 * problema -- struct de representacao de um problema.
+	 Retorno:
+	 * O estado final obtido."
+
+	(let* ((estado-inicial (problema-estado-inicial problema))
+		  (estado-actual estado-inicial)
+		  (melhor-solucao estado-inicial)
+		  (operador (car (problema-operadores problema))) ;podemos fazer car, so ha 1 operador..
+		  (objectivo? (problema-objectivo? problema))
+		  (sucessores '()))
+		(loop
+			(loop
+				(when (funcall objectivo? estado-actual)
+					(if (< (custo-estado estado-actual) (custo-estado melhor-solucao))
+						(setf melhor-solucao estado-actual))
+					(return))
+				(setf sucessores (funcall operador estado-actual))
+				(setf estado-actual (nth (random (length sucessores)) sucessores))
+			)
+			(when (>= (calcula-tempo-execucao) +max-tempo-execucao+)
+				(return-from sondagem-iterativa melhor-solucao))
+
+			(setf estado-actual estado-inicial))))
+
+
+(defun calcula-tempo-execucao ()
+
+	"Calcula o tempo de execucao do programa.
+
+	 Retorno:
+	 * O tempo de execucao desde o inicio do programa em segundos."
+
+	(float (/ (- (get-internal-run-time) *tempo-execucao-inicial*) internal-time-units-per-second)))
+
 
 (defun faz-afectacao (problema estrategia)
 
@@ -383,34 +421,48 @@
 
 	;;comecar por transformar a lista de tarefas numa lista de turnos
 
-	(setf *tempo-execucao-inicial* (get-universal-time))
+	(setf *tempo-execucao-inicial* (get-internal-run-time))
 	(let ((solucao NIL)
 		  (tempo 0)
-		  (funcao-heuristica NIL))
+		  (funcao-heuristica NIL)
+		  (usa-procura? NIL))
 		(cond 
 			((equal estrategia "melhor.abordagem")
 				NIl)
 			((equal estrategia "a*.melhor.heuristica")
 				(progn
 					(setf funcao-heuristica #'n-turnos)
-					(setf estrategia "a*")))
+					(setf estrategia "a*")
+					(setf usa-procura? T)))
 			((equal estrategia "a*.melhor.heuristica.alternativa")
 				(progn
 					(setf funcao-heuristica #'heuristica-alternativa)
-					(setf estrategia "a*")))
+					(setf estrategia "a*")
+					(setf usa-procura? T)))
 			((equal estrategia "sondagem.iterativa")
-				NIL)
+				(progn 
+					(setf problema (cria-problema (le-estado-inicial problema)
+						  (list #'operador)
+						  :objectivo? #'objectivo-p
+						  :custo #'custo-estado
+						  :heuristica #'n-turnos))
+				(setf solucao (sondagem-iterativa problema))))
 			((equal estrategia "ILDS")
 				NIL)
 			((equal estrategia "abordagem.alternativa")
-				(setf estrategia "profundidade")))
+				(setf estrategia "profundidade")
+				(setf usa-procura? T)))
+		(when usa-procura?
+			(setf problema (cria-problema (le-estado-inicial problema)
+									  (list #'operador)
+									  :objectivo? #'objectivo-p
+									  :custo #'custo-estado
+									  :heuristica funcao-heuristica))
+			(setf solucao (procura problema estrategia))
+			(setf solucao (car (last (car solucao)))))
 
-		(setf problema (cria-problema (le-estado-inicial problema)
-								  (list #'operador)
-								  :objectivo? #'objectivo-p
-								  :custo #'custo-estado
-								  :heuristica funcao-heuristica))
-		(setf solucao (procura problema estrategia))
-		(setf tempo (nth 1 solucao))
-		(setf solucao (car (last (car solucao))))
-		(cons (cons (cons solucao (custo-estado solucao)) (n-turnos solucao)) (float (/ tempo internal-time-units-per-second)))))
+		;;Se tiver sido resolvido usando procura.lisp
+		;;e necessario obter o ultimo elemento do caminho devolvido
+
+		(setf tempo (calcula-tempo-execucao))
+		(cons (cons (cons solucao (custo-estado solucao)) (n-turnos solucao)) tempo)))
