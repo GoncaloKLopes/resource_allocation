@@ -4,7 +4,7 @@
 (load "procura")
 (load "turnos-teste")
 
-(defconstant +max-tempo-execucao+ 270)
+(defconstant +max-tempo-execucao+ 30)
 
 (defconstant +duracao-max-turno+ 480)
 (defconstant +duracao-min-turno+ 360)
@@ -480,7 +480,7 @@
          (caminho estado))
     
     (if (null sucessores)
-        (return melhor))
+        (return-from ilds melhor))
     
     (setf caminho (append (list (first sucessores)) (last sucessores) caminho))
     (setf actual (first caminho))
@@ -489,7 +489,7 @@
     (loop
       (if (or (> (- (get-universal-time) tempoi) 60)
               (equal caminho estado))
-          (return melhor))
+          (return-from ilds melhor))
       
       (if (objectivo-p actual)
           (progn
@@ -538,9 +538,6 @@
 	 				;(format t "~A ~%" k)
 	 				(expt 0.95 k)))
 	 	(loop
-
-	 		
-
 	 		(if usa-funcao-temp?
 	 			(progn
 	 				(setf temperatura (temperatura-exp i))
@@ -563,7 +560,7 @@
 	 		(setf custo-proximo-estado (custo-estado proximo-estado)) 
 	 	
 
-	 		(if (> custo-proximo-estado custo-actual)
+	 		(if (< custo-proximo-estado custo-actual)
 		 		(progn
 		 			(setf estado-actual proximo-estado)
 
