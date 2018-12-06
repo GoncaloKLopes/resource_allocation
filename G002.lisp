@@ -5,11 +5,15 @@
 (load "turnos-teste")
 
 (defconstant +max-tempo-execucao+ 295) ;5segundos de seguranca.. (295 default)
+
 (defconstant +duracao-max-turno+ 480)
 (defconstant +duracao-min-turno+ 360)
 (defconstant +duracao-pausa+ 40)
 (defconstant +duracao-antes-refeicao+ 240)
 (defconstant +local-inicial+ 'L1)
+
+(defconstant +probabilidade-mutacao+ 0.2)
+(defconstant +tamanho-populacao-defeito+ 10)
 
 (defvar *tempo-execucao-inicial* (get-internal-run-time))
 
@@ -45,6 +49,16 @@
 
 	(float (/ (- (get-internal-run-time) *tempo-execucao-inicial*) internal-time-units-per-second)))
 
+
+(defun gera-numero-decimal ()
+
+	"Gera um numero decimal entre 0 e 1 com 3 casas decimais.
+
+	 Retorno:
+	 * Um numero decimal entre 0 e 1 com 3 casas decimais."
+
+	(float (/ (random 1001) 1000)))
+
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -58,13 +72,11 @@
 
 (defstruct turno
 	tarefas
-	duracao-total
-	duracao-conducao)
+	duracao-total)
 
 
 (defun cria-turno (tarefas
-					&key (duracao-total NIL)
-					(duracao-conducao NIL))
+					&key (duracao-total NIL))
 	(if (null duracao-total)
 		(let ((primeira-tarefa (car tarefas))
 		       (ultima-tarefa (car (last tarefas)))
@@ -79,15 +91,9 @@
 
 		    (setf duracao-total (max +duracao-min-turno+ (-  tempof-ultima-tarefa tempoi-primeira-tarefa)))))
 
-	(if (null duracao-conducao)
-		(progn
-			(setf duracao-conducao 0)
-			(dolist (tarefa tarefas)
-				(setf duracao-conducao (+ duracao-conducao (tarefa-calcula-duracao tarefa))))))
 	(make-turno
 		:tarefas tarefas
-		:duracao-total duracao-total
-		:duracao-conducao duracao-conducao))
+		:duracao-total duracao-total))
 
 (defun last-turno (turno)
 
@@ -157,8 +163,7 @@
 	 * Novo turno gerado de unir turno1 e turno2 se puderem ser unidos,
 	   NIL caso nao seja possível."
 
-	(let* (
-		   (primeira-tarefa-t1 (car (turno-tarefas turno1)))
+	(let* ((primeira-tarefa-t1 (car (turno-tarefas turno1)))
 		   (ultima-tarefa-t1 (last-turno  turno1))
 		   (primeira-tarefa-t2 (car (turno-tarefas turno2)))
 		   (ultima-tarefa-t2 (last-turno turno2))
@@ -173,11 +178,8 @@
 		   (local-fim-t1 (nth 1 ultima-tarefa-t1))
 		   (local-fim-t2 (nth 1 ultima-tarefa-t2))
 
-		   (tempo-conducao-t1 (turno-duracao-conducao turno1))
-		   (tempo-conducao-t2 (turno-duracao-conducao turno2))
-
-		   (tempo-conducao-uniao (+ tempo-conducao-t1 tempo-conducao-t2)))
-
+		   (tempo-total-t1 (- tempo-fim-t1 tempo-inicio-t1))
+		   (tempo-total-t2 (- tempo-fim-t2 tempo-inicio-t2)))
 
 		(if (not (eq local-inicio-t1 +local-inicial+)) 
 			(setf tempo-inicio-t1 (- tempo-inicio-t1 +duracao-pausa+)))
@@ -187,21 +189,21 @@
 
 	  	(let ((une? NIL)
 	  		  (duracao-uniao (- tempo-fim-t2 tempo-inicio-t1)))
-	  		;(format t "sobrepostas? ~A ~%" (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
-	  		;(format t "duracao= ~A ~%" (- tempo-fim-t2 tempo-inicio-t1))
-	  		;(format t "aux = ~A ~%" (<= tempo-conducao-t1 +duracao-antes-refeicao+))
+	  		;(format t "sobrepostas? ~A ~A ? =~A ~%" ultima-tarefa-t1 primeira-tarefa-t2 (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
+	  		;(format t "duracao= ~A ~%" duracao-uniao)
+	  		;(format t "aux = ~A ~%" (<= tempo-total-t1 +duracao-antes-refeicao+))
 			(if (and (<=  duracao-uniao +duracao-max-turno+) ;tempototal < duracao max turno
 					 (not (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
-			         (or (and (> tempo-conducao-t1 +duracao-antes-refeicao+) ;tempo(t1) > 240
-						      (<= tempo-conducao-t2 +duracao-antes-refeicao+)) ; tempo(t1) > 240 AND tempo(t2) <= 240 
+			         (or (and (> tempo-total-t1 +duracao-antes-refeicao+) ;tempo(t1) > 240
+						      (<= tempo-total-t2 +duracao-antes-refeicao+)) ; tempo(t1) > 240 AND tempo(t2) <= 240 
 
-						 (and (> tempo-conducao-t2 +duracao-antes-refeicao+) ; tempo(t2) > 240
-			            	  (<= tempo-conducao-t1 +duracao-antes-refeicao+)) ; tempo(t1) <= 240 AND tempo(t2) > 240
+						 (and (> tempo-total-t2 +duracao-antes-refeicao+) ; tempo(t2) > 240
+			            	  (<= tempo-total-t1 +duracao-antes-refeicao+)) ; tempo(t1) <= 240 AND tempo(t2) > 240
 
-	 					 (and (<= tempo-conducao-t1 +duracao-antes-refeicao+)
-						      (<= tempo-conducao-t2 +duracao-antes-refeicao+)
-						      (or (<= tempo-conducao-uniao +duracao-antes-refeicao+);tempo(t1) <= 240 AND tempo(t2) <= 240 AND tempo(t1) + tempo(t2) <= 240
-								  (and (> tempo-conducao-uniao +duracao-antes-refeicao+) ;tempo(t1) <= 240 AND tempo(t2) <= 240 AND tempo(t1) + tempo(t2) > 240
+	 					 (and (<= tempo-total-t1 +duracao-antes-refeicao+)
+						      (<= tempo-total-t2 +duracao-antes-refeicao+)
+						      (or (<= duracao-uniao +duracao-antes-refeicao+);tempo(t1) <= 240 AND tempo(t2) <= 240 AND tempo(t1) + tempo(t2) <= 240
+								  (and (> duracao-uniao +duracao-antes-refeicao+) ;tempo(t1) <= 240 AND tempo(t2) <= 240 AND tempo(t1) + tempo(t2) > 240
 								       (or (and (>= (- tempo-inicio-t2 tempo-fim-t1) +duracao-pausa+)
 										  	    (eq local-inicio-t2 local-fim-t1)) ;existe espaco entre os turnos para refeicao?
 
@@ -220,17 +222,17 @@
 
   (let ((novo-estado (copy-list estado)))
     (cond ((turnos-unificaveis-p turno1 turno2)
-    	(let* ((novas-tarefas (turno-tarefas (nth index1 novo-estado)))
-    		   (nova-duracao-conducao (+ (turno-duracao-conducao turno1)
-    		                             (turno-duracao-conducao turno2))))
+    	(let* ((novas-tarefas (turno-tarefas (nth index1 novo-estado))))
+    		;(format t "~% ################### ~%")
 
 			(setf novas-tarefas (append novas-tarefas (turno-tarefas (nth index2 novo-estado))))
 
-			(setf (nth index1 novo-estado) (cria-turno novas-tarefas :duracao-conducao nova-duracao-conducao))
+			(setf (nth index1 novo-estado) (cria-turno novas-tarefas ))
 
 			(setf novo-estado (remove-nth index2 novo-estado)))
 
 			novo-estado))))
+
 
 (defun conta-pausas (turno)
   (let ((primeiro (first (turno-tarefas turno)))
@@ -304,9 +306,11 @@
 		  (resultado '())
 		  (juntou? NIL))
     	(loop 
+    		;(format t "RESULTADO! ~A ~%" resultado)
       		(if (null resto) (return))
       		(progn
         		(setf juntou? (junta-turnos estado primeiro i (first resto-aux) j)) 
+        		;(format t "PODE JUNTAR ~A ~A  = ~A ~%" primeiro (first resto-aux) juntou?)
     			(if juntou?
         			(setf resultado (append resultado (list juntou?))))
         		(setf resto-aux (rest resto-aux))
@@ -390,6 +394,27 @@
 ;;; Estrategias de procura implementadas
 ;;;
 
+(defun gera-estado (problema)
+
+	"Gera um estado objectivo aleatorio atraves da expansao sucessiva
+	 de estados de maneira aleatoria.
+	 Argumentos:
+	 * problema -- struct de representacao de um problema.
+	 Retorno:
+	 * O estado final obtido."
+
+	(let* ((estado-actual (problema-estado-inicial problema))
+		  (operador (car (problema-operadores problema))) ;podemos fazer car, so ha 1 operador..
+		  (objectivo? (problema-objectivo? problema))
+		  (sucessores '()))
+		(loop
+				(when (funcall objectivo? estado-actual)
+					(return-from gera-estado estado-actual))
+
+				(setf sucessores (funcall operador estado-actual))
+				(setf estado-actual (nth (random (length sucessores)) sucessores)))))
+
+
 (defun sondagem-iterativa (problema)
 
 	"Utiliza a estrategia de songagem iterativa para resolver um problema de procura.
@@ -413,7 +438,7 @@
 				(setf sucessores (funcall operador estado-actual))
 				(setf estado-actual (nth (random (length sucessores)) sucessores))
 			)
-			(when (>= (calcula-tempo-execucao) +max-tempo-execucao+)
+			(if (>= (calcula-tempo-execucao) +max-tempo-execucao+)
 				(return-from sondagem-iterativa melhor-solucao))
 
 			(setf estado-actual estado-inicial))))
@@ -428,7 +453,11 @@
 	(flet ((ilds-iter (estado, k, profundidade)))
 	) |#
 
-(defun genetico (problema)
+;;;
+;;; 	Procura Genetica
+;;;
+
+#|(defun procura-genetica (problema)
 
 	"Utiliza procura genetica para resolver um problema de procura.
 	 Argumentos:
@@ -436,9 +465,62 @@
 	 Retorno:
 	 * O estado final obtido."
 
+	 (let* ((melhor-solucao (problema-estado-inicial problema))
+	 	   (operador (car (problema-operadores problema))) ;podemos fazer car, so ha 1 operador..
+		   (objectivo? (problema-objectivo? problema))
+		   (populacao (cria-populacao (melhor-solucao)))
+		   (nova-populacao '())
+		   (x)
+		   (y)
+		   (filho))
+	 	(loop
+	 		(dotimes (i (length populacao))
+	 			(setf x (selecao-aleatoria (populacao)))
+	 			(setf y (selecao-aleatoria (populacao)))
+	 			(setf filho (reproduz (x y)))
+	 			(if (< (gera-numero-decimal) +probabilidade-mutacao+)
+	 				(setf filho (muta (filho))))
+	 			(when (and (funcall objectivo? filho)
+					       (< (custo-estado filho) (custo-estado melhor-solucao)))
+					(setf melhor-solucao filho))
+	 			(setf nova-populacao (append (nova-populacao (list filho))))
+	 			(if))
+	 		(setf populacao nova-populacao)
 
-	)
 
+			(if (>= (calcula-tempo-execucao) +max-tempo-execucao+)
+				(return-from sondagem-iterativa melhor-solucao)))))|#
+
+
+
+
+
+(defun cria-populacao (problema)
+
+	"Cria uma populacao de estados, atraves da expancao.
+	 Argumentos:
+	 * problema -- struct de representacao de um problema.
+	 Retorno:
+	 * O estado final obtido."
+
+	(let ((populacao '()))
+		(dotimes (n +tamanho-populacao-defeito+)
+			(setf populacao (append populacao (list (gera-estado problema)))))
+		populacao))
+
+#|
+(defun reproduz (estado1 estado2)
+
+	"Cria um estado novo combinando caracteristicas de ambos os estados.
+
+	 Argumentos:
+	 * estado1, estado2 -- estados a serem combinados
+	 Retorno:
+	 * O estado final obtido."
+
+
+
+	)|#
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -504,3 +586,12 @@
 
 		(setf tempo (calcula-tempo-execucao))
 		(cons (cons (cons solucao (custo-estado solucao)) (n-turnos solucao)) tempo)))
+
+			#|(setf prob1 (cria-problema (le-estado-inicial px)
+									  (list #'operador)
+									  :objectivo? #'objectivo-p
+									  :custo #'custo-estado
+									  :heuristica "lh2"))|#
+
+
+
