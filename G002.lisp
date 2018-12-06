@@ -4,7 +4,7 @@
 (load "procura")
 (load "turnos-teste")
 
-(defconstant +max-tempo-execucao+ 295) ;5segundos de seguranca.. (295 default)
+(defconstant +max-tempo-execucao+ 270)
 
 (defconstant +duracao-max-turno+ 480)
 (defconstant +duracao-min-turno+ 360)
@@ -12,8 +12,7 @@
 (defconstant +duracao-antes-refeicao+ 240)
 (defconstant +local-inicial+ 'L1)
 
-(defconstant +probabilidade-mutacao+ 0.2)
-(defconstant +tamanho-populacao-defeito+ 10)
+(defconstant +temperatura-minima+ 10E-20)
 
 (defvar *tempo-execucao-inicial* (get-internal-run-time))
 
@@ -57,7 +56,7 @@
 	 Retorno:
 	 * Um numero decimal entre 0 e 1 com 3 casas decimais."
 
-	(float (/ (random 1001) 1000)))
+	(float (/ (random (1+ 10E10)) 10E10)))
 
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -109,6 +108,7 @@
 
 (defun tem-vaga-t1 (turno1 t2f)
 	;(format t "tem-vaga-t1 IN ~%")
+	;(format t "~A ~%" turno1)
   (let* ((turno (reverse (turno-tarefas turno1)))
          (primeiro (first turno))
          (resto (rest turno))
@@ -116,7 +116,8 @@
          (pausas 0))
         
     (loop
-      
+      (if (null segundo)
+      	(return nil))
       (when (> (- t2f (third primeiro)) +duracao-antes-refeicao+)
       	;(format t "tem-vaga-t1 OUT ~%")
           (return nil))     
@@ -124,7 +125,7 @@
           (setf pausas (+ pausas +duracao-pausa+))
         (setf pausas (+ pausas (* 2 +duracao-pausa+))))
       (when (>= (- (third primeiro) (fourth segundo) pausas) 0)
-      	;(format t "tem-vaga-t1 OUT ~%")
+      ;	(format t "tem-vaga-t1 OUT ~%")
           (return T))
         
       (setf primeiro (first resto))
@@ -142,7 +143,8 @@
          (pausas 0))
     
     (loop
-      
+      (if (null segundo)
+      	(return nil))
       (if (equal (second primeiro) (first segundo))
           (setf pausas (+ pausas +duracao-pausa+))
         (setf pausas (+ pausas (* 2 +duracao-pausa+))))
@@ -198,7 +200,7 @@
 			(setf tempo-fim-t2 (+ tempo-fim-t2 +duracao-pausa+))
 			(setf tempo-total-t2 (+ tempo-total-t2 +duracao-pausa+)))
 
-	  	(when (not (eq local-fim-t2 +local-inicial+)) 
+	  	(when (not (eq local-inicio-t2 +local-inicial+)) 
 			(setf tempo-total-t2 (+ tempo-total-t2 +duracao-pausa+)))
 
 	  	(let ((une? NIL)
@@ -298,6 +300,7 @@
 
 		(< (nth 2 tarefa2) (+ (nth 3 tarefa1) (* pausa? +duracao-pausa+)))))
 
+
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -340,6 +343,32 @@
                (setf resto-aux resto)
                (setf j (1+ i))))))resultado))
 
+
+(defun operador-contrario (estado)
+
+	"Gera a lista de antecessores dado um estado, em que cada antecessor
+	 consiste numa separacao de 1 turno em 2, mantendo-se os outros turnos iguais.
+
+	 Argumentos:
+	 * estado -- lista de turnos.
+	 Retorno:
+	 * Lista de estados que representa os antecessores."
+
+	(let ((antecessores)
+		  (prefixo)
+		  (sufixo (cdr estado))
+		  (novo-estado))
+
+		(dolist (turno estado)
+			(dotimes (n (1- (length (turno-tarefas turno))))
+				(setf novo-estado (append prefixo (list (cria-turno (subseq (turno-tarefas turno) 0 (1+ n))))))
+				(when (> (length (turno-tarefas turno)) 1)
+					(setf novo-estado (append novo-estado (list (cria-turno (subseq (turno-tarefas turno) (1+ n) (length (turno-tarefas turno))))) sufixo)))
+				(setf antecessores (append antecessores (list novo-estado))))
+			(setf prefixo (append prefixo (list turno)))
+			(setf sufixo (cdr sufixo)))
+
+		antecessores))
 
 (defun n-turnos (estado)
 
@@ -412,26 +441,6 @@
 ;;; Estrategias de procura implementadas
 ;;;
 
-(defun gera-estado (problema)
-
-	"Gera um estado objectivo aleatorio atraves da expansao sucessiva
-	 de estados de maneira aleatoria.
-	 Argumentos:
-	 * problema -- struct de representacao de um problema.
-	 Retorno:
-	 * O estado final obtido."
-
-	(let* ((estado-actual (problema-estado-inicial problema))
-		  (operador (car (problema-operadores problema))) ;podemos fazer car, so ha 1 operador..
-		  (objectivo? (problema-objectivo? problema))
-		  (sucessores '()))
-		(loop
-				(when (funcall objectivo? estado-actual)
-					(return-from gera-estado estado-actual))
-
-				(setf sucessores (funcall operador estado-actual))
-				(setf estado-actual (nth (random (length sucessores)) sucessores)))))
-
 
 (defun sondagem-iterativa (problema)
 
@@ -472,70 +481,80 @@
 	) |#
 
 ;;;
-;;; 	Procura Genetica
+;;; 	Tempera Simulada
 ;;;
-#|
-(defun procura-genetica (problema)
 
-	"Utiliza procura genetica para resolver um problema de procura.
+(defun tempera-simulada (problema)
+
+	"Utiliza tempera simulada para resolver um problema de procura.
 	 Argumentos:
 	 * problema -- struct de representacao de um problema.
 	 Retorno:
 	 * O estado final obtido."
 
 	 (let* ((melhor-solucao (problema-estado-inicial problema))
-	 	   (operador (car (problema-operadores problema))) ;podemos fazer car, so ha 1 operador..
-		   (objectivo? (problema-objectivo? problema))
-		   (populacao (cria-populacao (melhor-solucao)))
-		   (nova-populacao '())
-		   (x)
-		   (y)
-		   (filho))
-	 	(loop
-	 		(dotimes (i (length populacao))
-	 			(setf x (selecao-aleatoria (populacao)))
-	 			(setf y (selecao-aleatoria (populacao)))
-	 			(setf filho (reproduz (x y)))
-	 			(if (< (gera-numero-decimal) +probabilidade-mutacao+)
-	 				(setf filho (muta (filho))))
-	 			(when (and (funcall objectivo? filho)
-					       (< (custo-estado filho) (custo-estado melhor-solucao)))
-					(setf melhor-solucao filho))
-	 			(setf nova-populacao (append (nova-populacao (list filho))))
-	 			(if))
-	 		(setf populacao nova-populacao)
+	 	   (operadores (problema-operadores problema)) 
+		   (i 1)
+		   (estado-actual melhor-solucao)
+		   (proximo-estado)
+		   (temperatura)
+		   (sucessores)
+		   (custo-melhor-solucao (custo-estado melhor-solucao))
+		   (custo-proximo-estado)
+		   (usa-funcao-temp? T)
+		   (custo-actual (custo-estado estado-actual)))
 
+
+	 	(flet ((temperatura-exp (k)
+	 				;(format t "~A ~%" k)
+	 				(expt 0.95 k)))
+	 	(loop
+
+	 		
+
+	 		(if usa-funcao-temp?
+	 			(progn
+	 				(setf temperatura (temperatura-exp i))
+	 				(when (< (temperatura-exp i) +temperatura-minima+)
+	 					(setf usa-funcao-temp? NIL)
+	 					(setf temperatura +temperatura-minima+)))
+	 			(setf temperatura +temperatura-minima+))
+
+	 		(dolist (operador operadores)
+      			(setf sucessores (append (funcall operador estado-actual) sucessores)))
+	 		;(format t "~A ~%" estado-actual)
+	 		;(format t "~% $$$$$$$$$$$$$$$ ~%")
+	 		;(format t "~A  ~%"  (operador estado-actual))
+	 		;(format t " ~A  ~A ~%" temperatura i)
+	 		;(format t "~% ############### ~%")
+	 		;(format t "~A  ~%"  (operador-contrario estado-actual))
+	 		;(format t "~% !!!!!!!!!!!!!!!! ~%")
+	 		(setf proximo-estado (nth (random (length sucessores)) sucessores))
+
+	 		(setf custo-proximo-estado (custo-estado proximo-estado)) 
+	 	
+
+	 		(if (> custo-proximo-estado custo-actual)
+		 		(progn
+		 			(setf estado-actual proximo-estado)
+
+		 			;;custo-proximo-estado = custo do estado actual devido a linha de cima..
+		 			(when (< custo-proximo-estado custo-melhor-solucao) 
+		 				(setf melhor-solucao estado-actual)
+		 				(setf custo-melhor-solucao custo-proximo-estado)))
+
+		 		(if (< (gera-numero-decimal) temperatura)
+		 			(setf estado-actual proximo-estado)))
+
+	 		(setf custo-actual (custo-estado estado-actual))
 
 			(if (>= (calcula-tempo-execucao) +max-tempo-execucao+)
-				(return-from sondagem-iterativa melhor-solucao)))))
-|#
+				(return-from tempera-simulada melhor-solucao))
 
-(defun cria-populacao (problema)
-
-	"Cria uma populacao de estados, atraves da expancao.
-	 Argumentos:
-	 * problema -- struct de representacao de um problema.
-	 Retorno:
-	 * O estado final obtido."
-
-	(let ((populacao '()))
-		(dotimes (n +tamanho-populacao-defeito+)
-			(setf populacao (append populacao (list (gera-estado problema)))))
-		populacao))
-
-#|
-(defun reproduz (estado1 estado2)
-
-	"Cria um estado novo combinando caracteristicas de ambos os estados.
-
-	 Argumentos:
-	 * estado1, estado2 -- estados a serem combinados
-	 Retorno:
-	 * O estado final obtido."
+	 		(setf i (1+ i))))))
 
 
 
-	)|#
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -585,8 +604,13 @@
 			((equal estrategia "ILDS")
 				NIL)
 			((equal estrategia "abordagem.alternativa")
-				(setf estrategia "profundidade")
-				(setf usa-procura? T)))
+				(progn 
+					(setf problema (cria-problema (le-estado-inicial problema)
+						  (list #'operador #'operador-contrario)
+						  :objectivo? #'objectivo-p
+						  :custo #'custo-estado
+						  :heuristica #'n-turnos))
+				(setf solucao (tempera-simulada problema)))))
 		(when usa-procura?
 			(setf problema (cria-problema (le-estado-inicial problema)
 									  (list #'operador)
@@ -599,15 +623,14 @@
 		;;Se tiver sido resolvido usando procura.lisp
 		;;e necessario obter o ultimo elemento do caminho devolvido
 
-		(format t "OVER ~%") 
 		(setf tempo (calcula-tempo-execucao))
 		(cons (cons (cons solucao (custo-estado solucao)) (n-turnos solucao)) tempo)))
 
-			(setf prob1 (cria-problema (le-estado-inicial p1)
+		#|	(setf prob1 (cria-problema (le-estado-inicial p1)
 									  (list #'operador)
 									  :objectivo? #'objectivo-p
 									  :custo #'custo-estado
-									  :heuristica "lh2"))
+									  :heuristica "lh2"))|#
 
 
 
