@@ -108,6 +108,7 @@
 	 (car (last (turno-tarefas turno))))
 
 (defun tem-vaga-t1 (turno1 t2f)
+	;(format t "tem-vaga-t1 IN ~%")
   (let* ((turno (reverse (turno-tarefas turno1)))
          (primeiro (first turno))
          (resto (rest turno))
@@ -116,12 +117,14 @@
         
     (loop
       
-      (if (> (- t2f (third primeiro)) +duracao-antes-refeicao+)
+      (when (> (- t2f (third primeiro)) +duracao-antes-refeicao+)
+      	;(format t "tem-vaga-t1 OUT ~%")
           (return nil))     
       (if (equal (first primeiro) (second segundo))
           (setf pausas (+ pausas +duracao-pausa+))
         (setf pausas (+ pausas (* 2 +duracao-pausa+))))
-      (if (>= (- (third primeiro) (fourth segundo) pausas) 0)
+      (when (>= (- (third primeiro) (fourth segundo) pausas) 0)
+      	;(format t "tem-vaga-t1 OUT ~%")
           (return T))
         
       (setf primeiro (first resto))
@@ -131,6 +134,7 @@
 
 
 (defun tem-vaga-t2 (turno t1i)
+  ;(format t "tem-vaga-t2 IN ~%")
   (let* ((turno (turno-tarefas turno))
   	     (primeiro (first turno))
          (resto (rest turno))
@@ -142,9 +146,11 @@
       (if (equal (second primeiro) (first segundo))
           (setf pausas (+ pausas +duracao-pausa+))
         (setf pausas (+ pausas (* 2 +duracao-pausa+))))
-      (if (> (- (fourth primeiro) t1i) (- +duracao-antes-refeicao+ pausas))
+      (when (> (- (fourth primeiro) t1i) (- +duracao-antes-refeicao+ pausas))
+      	;(format t "tem-vaga-t2 OUT ~%")
           (return nil))
-      (if (>= (- (third segundo) (fourth primeiro) pausas) 0)
+      (when (>= (- (third segundo) (fourth primeiro) pausas) 0)
+      	;(format t "tem-vaga-t2 OUT ~%")
           (return T))
       
       (setf primeiro (first resto))
@@ -162,7 +168,7 @@
 	 Retorno:
 	 * Novo turno gerado de unir turno1 e turno2 se puderem ser unidos,
 	   NIL caso nao seja possível."
-
+	   ;(format t "turnos-unificaveis-p IN ~%")
 	(let* ((primeira-tarefa-t1 (car (turno-tarefas turno1)))
 		   (ultima-tarefa-t1 (last-turno  turno1))
 		   (primeira-tarefa-t2 (car (turno-tarefas turno2)))
@@ -181,17 +187,27 @@
 		   (tempo-total-t1 (- tempo-fim-t1 tempo-inicio-t1))
 		   (tempo-total-t2 (- tempo-fim-t2 tempo-inicio-t2)))
 
-		(if (not (eq local-inicio-t1 +local-inicial+)) 
-			(setf tempo-inicio-t1 (- tempo-inicio-t1 +duracao-pausa+)))
+		(when (not (eq local-inicio-t1 +local-inicial+)) 
+			(setf tempo-inicio-t1 (- tempo-inicio-t1 +duracao-pausa+))
+			(setf tempo-total-t1 (+ tempo-total-t1 +duracao-pausa+)))
+
+		(when (not (eq local-fim-t1 +local-inicial+)) 
+			(setf tempo-total-t1 (+ tempo-total-t1 +duracao-pausa+)))
 	  
-	  	(if (not (eq local-fim-t2 +local-inicial+)) 
-			(setf tempo-fim-t2 (+ tempo-fim-t2 +duracao-pausa+)))
+	  	(when (not (eq local-fim-t2 +local-inicial+)) 
+			(setf tempo-fim-t2 (+ tempo-fim-t2 +duracao-pausa+))
+			(setf tempo-total-t2 (+ tempo-total-t2 +duracao-pausa+)))
+
+	  	(when (not (eq local-fim-t2 +local-inicial+)) 
+			(setf tempo-total-t2 (+ tempo-total-t2 +duracao-pausa+)))
 
 	  	(let ((une? NIL)
 	  		  (duracao-uniao (- tempo-fim-t2 tempo-inicio-t1)))
+	  		;(format t "t1 = ~A  t2 = ~A ~%" turno1 turno2)
 	  		;(format t "sobrepostas? ~A ~A ? =~A ~%" ultima-tarefa-t1 primeira-tarefa-t2 (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
 	  		;(format t "duracao= ~A ~%" duracao-uniao)
-	  		;(format t "aux = ~A ~%" (<= tempo-total-t1 +duracao-antes-refeicao+))
+	  		;(format t "t1 refeicao? = ~A ~%" (<= tempo-total-t1 +duracao-antes-refeicao+))
+	  		;(format t "t2 refeicao? = ~A ~%" (<= tempo-total-t2 +duracao-antes-refeicao+))
 			(if (and (<=  duracao-uniao +duracao-max-turno+) ;tempototal < duracao max turno
 					 (not (tarefas-sobrepostas-p ultima-tarefa-t1 primeira-tarefa-t2))
 			         (or (and (> tempo-total-t1 +duracao-antes-refeicao+) ;tempo(t1) > 240
@@ -210,10 +226,12 @@
 										   (and (>= (- tempo-inicio-t2 tempo-fim-t1) (* 2 +duracao-pausa+))
 										        (not (eq local-inicio-t2 local-fim-t1))) ;existe espaco entre os turnos para refeicao e transporte?
 
-										   (tem-vaga-t1 turno1 tempo-fim-t2) 
-										   (tem-vaga-t2 turno2 tempo-inicio-t1)))))))
+										   (and (> (length (turno-tarefas turno1)) 1) 
+										   		   (tem-vaga-t1 turno1 tempo-fim-t2))
+										   (and (> (length (turno-tarefas turno2)) 1)    
+										   		   (tem-vaga-t2 turno2 tempo-inicio-t1))))))))
 						(setf une? T))
-			
+			;(format t "turnos-unificaveis-p OUT ~%")
 			une?)))
 
 
@@ -456,8 +474,8 @@
 ;;;
 ;;; 	Procura Genetica
 ;;;
-
-#|(defun procura-genetica (problema)
+#|
+(defun procura-genetica (problema)
 
 	"Utiliza procura genetica para resolver um problema de procura.
 	 Argumentos:
@@ -489,11 +507,8 @@
 
 
 			(if (>= (calcula-tempo-execucao) +max-tempo-execucao+)
-				(return-from sondagem-iterativa melhor-solucao)))))|#
-
-
-
-
+				(return-from sondagem-iterativa melhor-solucao)))))
+|#
 
 (defun cria-populacao (problema)
 
@@ -584,14 +599,15 @@
 		;;Se tiver sido resolvido usando procura.lisp
 		;;e necessario obter o ultimo elemento do caminho devolvido
 
+		(format t "OVER ~%") 
 		(setf tempo (calcula-tempo-execucao))
 		(cons (cons (cons solucao (custo-estado solucao)) (n-turnos solucao)) tempo)))
 
-			#|(setf prob1 (cria-problema (le-estado-inicial px)
+			(setf prob1 (cria-problema (le-estado-inicial p1)
 									  (list #'operador)
 									  :objectivo? #'objectivo-p
 									  :custo #'custo-estado
-									  :heuristica "lh2"))|#
+									  :heuristica "lh2"))
 
 
 
