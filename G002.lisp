@@ -469,16 +469,45 @@
 				(return-from sondagem-iterativa melhor-solucao))
 
 			(setf estado-actual estado-inicial))))
-#|
-(defun ilds (problema)
 
-	"Utiliza a estrategia ILDS para resolver um problema de procura.
-	 Argumentos:
-	 * problema -- struct de representacao de um problema.
-	 Retorno:
-	 * O estado final obtido."
-	(flet ((ilds-iter (estado, k, profundidade)))
-	) |#
+(defun ilds (estado)
+  (let* ((tempoi (get-universal-time))
+         (sucessores (operador estado))
+         (melhor estado)
+         (customelhor (custo-estado melhor))
+         (actual)
+         (custoactual)
+         (caminho estado))
+    
+    (if (null sucessores)
+        (return melhor))
+    
+    (setf caminho (append (list (first sucessores)) (last sucessores) caminho))
+    (setf actual (first caminho))
+    (setf caminho (rest caminho))
+     
+    (loop
+      (if (or (> (- (get-universal-time) tempoi) 60)
+              (equal caminho estado))
+          (return melhor))
+      
+      (if (objectivo-p actual)
+          (progn
+            (setf custoactual (custo-estado actual))
+            (if (< custoactual customelhor)
+                (progn
+                  (setf melhor actual)
+                  (setf customelhor custoactual)))))
+      
+      (setf sucessores (operador actual))
+      (if sucessores
+          (setf caminho (append (list (first sucessores)) (last sucessores) caminho)))
+      
+      (setf actual (first caminho))
+      (setf caminho (rest caminho)))    
+ melhor))
+
+
 
 ;;;
 ;;; 	Tempera Simulada
