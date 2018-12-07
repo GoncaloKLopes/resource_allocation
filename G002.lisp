@@ -497,6 +497,7 @@
 
 			(setf estado-actual estado-inicial))))
 
+
 (defun ilds (estado)
   (let* ((tempoi (get-universal-time))
          (sucessores (operador estado))
@@ -504,7 +505,9 @@
          (customelhor (custo-estado melhor))
          (actual)
          (custoactual)
-         (caminho estado))
+         (caminho estado)
+         (nos-expandidos 1)
+         (nos-gerados 0))
     
     (if (null sucessores)
         (return-from ilds melhor))
@@ -512,11 +515,13 @@
     (setf caminho (append (list (first sucessores)) (last sucessores) caminho))
     (setf actual (first caminho))
     (setf caminho (rest caminho))
-     
+    (setf nos-gerados (length sucessores))
+    (incf nos-expandidos)                         
+                              
     (loop
       (if (or (> (- (get-universal-time) tempoi) 60)
               (equal caminho estado))
-          (return-from ilds melhor))
+          (return-from ilds (append (list melhor) (list nos-gerados) (list nos-expandidos))))
       
       (if (objectivo-p actual)
           (progn
@@ -531,8 +536,11 @@
           (setf caminho (append (list (first sucessores)) (last sucessores) caminho)))
       
       (setf actual (first caminho))
-      (setf caminho (rest caminho)))    
- melhor))
+      (setf caminho (rest caminho))
+      (setf nos-gerados (+ nos-gerados (length sucessores)))
+      (incf nos-expandidos))
+    
+    (append (list melhor) (list nos-gerados) (list nos-expandidos))))
 
 
 
