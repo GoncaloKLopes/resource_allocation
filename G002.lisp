@@ -1,10 +1,9 @@
 (in-package :user)
+;;;;; Grupo 002
+;; Gonçalo Lopes 76213
+;; Jessica Ramgi 75619
 
-(compile-file "procura.lisp")
-(load "procura")
-(load "turnos-teste")
-
-(defconstant +max-tempo-execucao+ 270)
+(defconstant +max-tempo-execucao+ 250)
 
 (defconstant +duracao-max-turno+ 480)
 (defconstant +duracao-min-turno+ 360)
@@ -542,13 +541,22 @@
       
       (setf custo-actual (custo-estado (car resultado-ilds-aux)))
       
-      (if (< custo-actual custo-melhor)
+      (if (< (length (car resultado-ilds-aux)) (length melhor))
           (progn
             (setf melhor estado-actual)
-            (setf custo-melhor custo-actual)))
+            (setf custo-melhor custo-actual))
+        (if (= (length (car resultado-ilds-aux)) (length melhor))
+            (if (< custo-actual custo-melhor)
+                (progn
+                  (setf melhor estado-actual)
+                  (setf custo-melhor custo-actual)))))
+            
       
       (setf nos-expandidos (+ nos-expandidos (- (length estado) (length (car resultado-ilds-aux)))))
+
       (setf nos-gerados (+ nos-gerados (length (cdr resultado-ilds-aux)) 1))))) 
+
+
 
 
 ;;;
@@ -651,15 +659,20 @@
 
 	(setf *tempo-execucao-inicial* (get-internal-run-time))
 	(let ((solucao NIL)
-		  (tempo 0)
 		  (funcao-heuristica NIL)
 		  (usa-procura? NIL)
 		  (estado-final NIL)
-		  (nos-expandidos)
-		  (nos-gerados))
+		  (resultado NIL))
 		(cond 
 			((equal estrategia "melhor.abordagem")
-				NIl)
+				(progn 
+					(setf problema (cria-problema (le-estado-inicial problema)
+						  (list #'operador)
+						  :objectivo? #'objectivo-p
+						  :custo #'custo-estado
+						  :heuristica #'n-turnos))
+				(setf solucao (sondagem-iterativa problema))
+				(setf estado-final (car solucao))))
 			((equal estrategia "a*.melhor.heuristica")
 				(progn
 					(setf funcao-heuristica #'n-turnos-curtos)
@@ -678,15 +691,11 @@
 						  :custo #'custo-estado
 						  :heuristica #'n-turnos))
 				(setf solucao (sondagem-iterativa problema))
-				(setf estado-final (car solucao))
-				(setf nos-expandidos (nth 1 solucao))
-				(setf nos-gerados (nth 2 solucao))))
+				(setf estado-final (car solucao))))
 			((equal estrategia "ILDS")
 				(progn 
 					(setf solucao (ilds (le-estado-inicial problema)))
-					(setf estado-final (car solucao))
-					(setf nos-expandidos (nth 1 solucao))
-					(setf nos-gerados (nth 2 solucao))))
+					(setf estado-final (car solucao))))
 			((equal estrategia "abordagem.alternativa")
 				(progn 
 					(setf problema (cria-problema (le-estado-inicial problema)
@@ -695,9 +704,7 @@
 						  :custo #'custo-estado
 						  :heuristica #'n-turnos))
 				(setf solucao (tempera-simulada problema))
-				(setf estado-final  (car solucao))
-				(setf nos-expandidos (nth 1 solucao))
-				(setf nos-gerados (nth 2 solucao)))))
+				(setf estado-final  (car solucao)))))
 		(when usa-procura?
 			(setf problema (cria-problema (le-estado-inicial problema)
 									  (list #'operador)
@@ -705,15 +712,14 @@
 									  :heuristica funcao-heuristica))
 			(setf solucao (procura problema estrategia))
 
-			(setf estado-final (car (last (car solucao))))
-			(setf nos-expandidos (nth 2 solucao))
-			(setf nos-gerados (nth 3 solucao)))
+			(setf estado-final (car (last (car solucao)))))
 
 		;;Se tiver sido resolvido usando procura.lisp
 		;;e necessario obter o ultimo elemento do caminho devolvido
 		;(format t "~A ~%" solucao)
-		(setf tempo (calcula-tempo-execucao))
-		(append (list estado-final) (list (custo-estado estado-final)) (list (n-turnos estado-final)) (list tempo) (list nos-expandidos) (list nos-gerados))))
+		(dolist (turno estado-final)
+			(setf resultado (append resultado (list (turno-tarefas turno)))))
+		resultado))
 
 		#|	(setf prob1 (cria-problema (le-estado-inicial p1)
 									  (list #'operador)
