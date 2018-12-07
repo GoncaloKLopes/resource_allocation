@@ -672,8 +672,8 @@
 						  :heuristica #'n-turnos))
 				(setf solucao (sondagem-iterativa problema))
 				(setf estado-final (car solucao))
-				(nos-expandidos (nth 1 solucao))
-				(nos-gerados (nth 2 solucao))))
+				(setf nos-expandidos (nth 1 solucao))
+				(setf nos-gerados (nth 2 solucao))))
 			((equal estrategia "ILDS")
 				(progn 
 					(setf solucao (ilds (le-estado-inicial problema)))))
