@@ -4,7 +4,7 @@
 (load "procura")
 (load "turnos-teste")
 
-(defconstant +max-tempo-execucao+ 30)
+(defconstant +max-tempo-execucao+ 270)
 
 (defconstant +duracao-max-turno+ 480)
 (defconstant +duracao-min-turno+ 360)
@@ -12,7 +12,7 @@
 (defconstant +duracao-antes-refeicao+ 240)
 (defconstant +local-inicial+ 'L1)
 
-(defconstant +temperatura-minima+ 10E-20)
+(defconstant +temperatura-minima+ 70E-20)
 
 (defvar *tempo-execucao-inicial* (get-internal-run-time))
 
@@ -254,12 +254,22 @@
 			novo-estado))))
 
 
-(defun conta-pausas (turno)
+(defun conta-pausas-turno (turno)
+
+	"Calcula a quantidade de tempo gasta fora de tarefas num turno
+	 Argumentos:
+	 * turno -- struct que representa um turno.
+	 Retorno:
+	 * Um inteiro correspondente ao numero de tarefas."
+
   (let ((primeiro (first (turno-tarefas turno)))
         (resto (rest (turno-tarefas turno)))
         (resultado 0))
+
+
+
     (loop 
-      (if (null resto) (return))
+      (if (null resto) (return-from conta-pausas-turno resultado))
       (setf resultado (+ resultado (- (third (first resto)) (fourth primeiro))))
       (setf primeiro (first resto))
       (setf resto (rest resto)))resultado))
@@ -414,6 +424,13 @@
     (dolist (turno estado) (setf resultado (+ resultado (conta-pausas turno))))
     (setf resultado (+ (list-length estado) (/ resultado 1000)))))
 
+(defun n-turnos-curtos (estado)
+  (let ((numero-turnos-curtos 0))
+    (dolist (turno estado)
+      (if (= (turno-duracao-total turno) +duracao-min-turno+)
+          (incf numero-turnos-curtos)))
+    numero-turnos-curtos))
+
 
 (defun le-estado-inicial (input)
 
@@ -432,6 +449,12 @@
       		(setf problema (append problema (list novo-turno)))))
   	problema))
 
+(defun conta-pausas-estado (estado)
+	(let ((total 0))
+		(dolist (turno estado)
+			(setf total (+ total (conta-pausas-turno turno))))
+		;(format t "~A  ~A ~%"  estado (+ total (custo-estado estado)))
+	total))
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -536,7 +559,7 @@
 
 	 	(flet ((temperatura-exp (k)
 	 				;(format t "~A ~%" k)
-	 				(expt 0.95 k)))
+	 				(expt 0.99 k)))
 	 	(loop
 	 		(if usa-funcao-temp?
 	 			(progn
@@ -611,7 +634,7 @@
 				NIl)
 			((equal estrategia "a*.melhor.heuristica")
 				(progn
-					(setf funcao-heuristica #'n-turnos)
+					(setf funcao-heuristica #'conta-pausas-estado)
 					(setf estrategia "a*")
 					(setf usa-procura? T)))
 			((equal estrategia "a*.melhor.heuristica.alternativa")
@@ -628,7 +651,8 @@
 						  :heuristica #'n-turnos))
 				(setf solucao (sondagem-iterativa problema))))
 			((equal estrategia "ILDS")
-				NIL)
+				(progn 
+					(setf solucao (ilds (le-estado-inicial problema)))))
 			((equal estrategia "abordagem.alternativa")
 				(progn 
 					(setf problema (cria-problema (le-estado-inicial problema)
@@ -636,14 +660,15 @@
 						  :objectivo? #'objectivo-p
 						  :custo #'custo-estado
 						  :heuristica #'n-turnos))
-				(setf solucao (tempera-simulada problema)))))
+				(setf solucao (tempera-simulada problema))
+				)))
 		(when usa-procura?
 			(setf problema (cria-problema (le-estado-inicial problema)
 									  (list #'operador)
 									  :objectivo? #'objectivo-p
-									  :custo #'custo-estado
 									  :heuristica funcao-heuristica))
 			(setf solucao (procura problema estrategia))
+			;(format t "~A ~%" solucao)
 			(setf solucao (car (last (car solucao)))))
 
 		;;Se tiver sido resolvido usando procura.lisp
