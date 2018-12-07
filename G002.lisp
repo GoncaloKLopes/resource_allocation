@@ -1,4 +1,4 @@
-﻿(in-package :user)
+(in-package :user)
 
 (compile-file "procura.lisp")
 (load "procura")
@@ -499,7 +499,7 @@
 
 ;;; ilds usando a funcao de custo
 
-#| (defun ilds-aux (estado)
+ (defun ilds-aux (estado)
   (let* ((sucessores-nao-ordenados (operador estado))
          (sucessores (sort sucessores-nao-ordenados #'< :key #'custo-estado))
          (estado-actual estado)
@@ -548,55 +548,7 @@
             (setf custo-melhor custo-actual)))
       
       (setf nos-expandidos (+ nos-expandidos (- (length estado) (length (car resultado-ilds-aux)))))
-      (setf nos-gerados (+ nos-gerados (length (cdr resultado-ilds-aux)) 1))))) |# 
-
-
-;;;ilds-primeiro e ultimo sucessor
-
-(defun ilds (estado)
-  (let* ((tempoi (get-universal-time))
-         (sucessores (operador estado))
-         (melhor estado)
-         (customelhor (custo-estado melhor))
-         (actual)
-         (custoactual)
-         (caminho estado)
-         (nos-expandidos 1)
-         (nos-gerados 0))
-    
-    (if (null sucessores)
-        (return-from ilds melhor))
-    
-    (setf caminho (append (list (first sucessores)) (last sucessores) caminho))
-    (setf actual (first caminho))
-    (setf caminho (rest caminho))
-    (setf nos-gerados (length sucessores))
-    (incf nos-expandidos)                         
-                              
-    (loop
-      (if (or (> (- (get-universal-time) tempoi) 60)
-              (equal caminho estado))
-          (return-from ilds (append (list melhor) (list nos-gerados) (list nos-expandidos))))
-      
-      (if (objectivo-p actual)
-          (progn
-            (setf custoactual (custo-estado actual))
-            (if (< custoactual customelhor)
-                (progn
-                  (setf melhor actual)
-                  (setf customelhor custoactual)))))
-      
-      (setf sucessores (operador actual))
-      (if sucessores
-          (setf caminho (append (list (first sucessores)) (last sucessores) caminho)))
-      
-      (setf actual (first caminho))
-      (setf caminho (rest caminho))
-      (setf nos-gerados (+ nos-gerados (length sucessores)))
-      (incf nos-expandidos))
-    
-    (append (list melhor) (list nos-gerados) (list nos-expandidos))))
-
+      (setf nos-gerados (+ nos-gerados (length (cdr resultado-ilds-aux)) 1))))) 
 
 
 ;;;
@@ -710,12 +662,12 @@
 				NIl)
 			((equal estrategia "a*.melhor.heuristica")
 				(progn
-					(setf funcao-heuristica #'conta-pausas-estado)
+					(setf funcao-heuristica #'n-turnos-curtos)
 					(setf estrategia "a*")
 					(setf usa-procura? T)))
 			((equal estrategia "a*.melhor.heuristica.alternativa")
 				(progn
-					(setf funcao-heuristica #'heuristica-alternativa)
+					(setf funcao-heuristica #'conta-pausas-estado)
 					(setf estrategia "a*")
 					(setf usa-procura? T)))
 			((equal estrategia "sondagem.iterativa")
@@ -731,7 +683,10 @@
 				(setf nos-gerados (nth 2 solucao))))
 			((equal estrategia "ILDS")
 				(progn 
-					(setf solucao (ilds (le-estado-inicial problema)))))
+					(setf solucao (ilds (le-estado-inicial problema)))
+					(setf estado-final (car solucao))
+					(setf nos-expandidos (nth 1 solucao))
+					(setf nos-gerados (nth 2 solucao))))
 			((equal estrategia "abordagem.alternativa")
 				(progn 
 					(setf problema (cria-problema (le-estado-inicial problema)
