@@ -1,4 +1,4 @@
-(in-package :user)
+﻿(in-package :user)
 
 (compile-file "procura.lisp")
 (load "procura")
@@ -497,6 +497,61 @@
 
 			(setf estado-actual estado-inicial))))
 
+;;; ilds usando a funcao de custo
+
+#| (defun ilds-aux (estado)
+  (let* ((sucessores-nao-ordenados (operador estado))
+         (sucessores (sort sucessores-nao-ordenados #'< :key #'custo-estado))
+         (estado-actual estado)
+         (resultado '()))
+ 
+    (loop
+     
+      (if (null sucessores)
+          (return (cons estado-actual resultado)))
+      
+      (setf estado-actual (first sucessores))
+      (setf resultado (append (rest sucessores) resultado)) 
+      (setf sucessores-nao-ordenados (operador estado-actual))
+      (setf sucessores (sort sucessores-nao-ordenados #'< :key #'custo-estado)))))
+
+(defun ilds (estado)
+  (let* ((tempoi (get-universal-time))
+         (resultado-ilds-aux (ilds-aux estado))
+         (estado-actual (car resultado-ilds-aux))
+         (nao-visitados (cdr resultado-ilds-aux))
+         (custo-actual)
+         (melhor estado-actual)
+         (custo-melhor (custo-estado melhor))
+         (nos-expandidos 1)
+         (nos-gerados (+ (length nao-visitados) 1)))
+      
+    (loop
+     
+      (if (or (null nao-visitados)
+              (> (- (get-universal-time) tempoi) +max-tempo-execucao+))
+          (return-from ilds (append (list melhor) (list (incf nos-expandidos)) (list nos-gerados))))
+      
+      
+      (setf estado-actual (car nao-visitados))
+      (setf nao-visitados (rest nao-visitados))
+      (setf resultado-ilds-aux (ilds-aux estado-actual))
+      
+      (if (cdr resultado-ilds-aux)
+          (setf nao-visitados (append nao-visitados (cdr resultado-ilds-aux))))
+      
+      (setf custo-actual (custo-estado (car resultado-ilds-aux)))
+      
+      (if (< custo-actual custo-melhor)
+          (progn
+            (setf melhor estado-actual)
+            (setf custo-melhor custo-actual)))
+      
+      (setf nos-expandidos (+ nos-expandidos (- (length estado) (length (car resultado-ilds-aux)))))
+      (setf nos-gerados (+ nos-gerados (length (cdr resultado-ilds-aux)) 1))))) |# 
+
+
+;;;ilds-primeiro e ultimo sucessor
 
 (defun ilds (estado)
   (let* ((tempoi (get-universal-time))
