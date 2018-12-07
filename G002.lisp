@@ -4,7 +4,7 @@
 (load "procura")
 (load "turnos-teste")
 
-(defconstant +max-tempo-execucao+ 270)
+(defconstant +max-tempo-execucao+ 5)
 
 (defconstant +duracao-max-turno+ 480)
 (defconstant +duracao-min-turno+ 360)
@@ -12,7 +12,7 @@
 (defconstant +duracao-antes-refeicao+ 240)
 (defconstant +local-inicial+ 'L1)
 
-(defconstant +temperatura-minima+ 70E-20)
+(defconstant +temperatura-minima+ 40E-20)
 
 (defvar *tempo-execucao-inicial* (get-internal-run-time))
 
@@ -478,7 +478,9 @@
 		  (melhor-solucao estado-inicial)
 		  (operador (car (problema-operadores problema))) ;podemos fazer car, so ha 1 operador..
 		  (objectivo? (problema-objectivo? problema))
-		  (sucessores '()))
+		  (sucessores '())
+		  (nos-expandidos 1)
+		  (nos-gerados 0))
 		(loop
 			(loop
 				(when (funcall objectivo? estado-actual)
@@ -486,10 +488,12 @@
 						(setf melhor-solucao estado-actual))
 					(return))
 				(setf sucessores (funcall operador estado-actual))
+				(setf nos-gerados (+ nos-gerados (length sucessores)))
+				(setf nos-expandidos (1+ nos-expandidos))
 				(setf estado-actual (nth (random (length sucessores)) sucessores))
 			)
 			(if (>= (calcula-tempo-execucao) +max-tempo-execucao+)
-				(return-from sondagem-iterativa melhor-solucao))
+				(return-from sondagem-iterativa (append (list melhor-solucao) (list nos-expandidos) (list nos-gerados))))
 
 			(setf estado-actual estado-inicial))))
 
@@ -554,7 +558,9 @@
 		   (custo-melhor-solucao (custo-estado melhor-solucao))
 		   (custo-proximo-estado)
 		   (usa-funcao-temp? T)
-		   (custo-actual (custo-estado estado-actual)))
+		   (custo-actual (custo-estado estado-actual))
+		   (nos-expandidos 1)
+		   (nos-gerados 0))
 
 
 	 	(flet ((temperatura-exp (k)
@@ -571,6 +577,8 @@
 
 	 		(dolist (operador operadores)
       			(setf sucessores (append (funcall operador estado-actual) sucessores)))
+	 		;(format t "~A ~%" (length sucessores))
+	 		(setf nos-gerados (+ nos-gerados (length sucessores)))
 	 		;(format t "~A ~%" estado-actual)
 	 		;(format t "~% $$$$$$$$$$$$$$$ ~%")
 	 		;(format t "~A  ~%"  (operador estado-actual))
@@ -590,16 +598,18 @@
 		 			;;custo-proximo-estado = custo do estado actual devido a linha de cima..
 		 			(when (< custo-proximo-estado custo-melhor-solucao) 
 		 				(setf melhor-solucao estado-actual)
+		 				(setf nos-expandidos (1+ nos-expandidos))
 		 				(setf custo-melhor-solucao custo-proximo-estado)))
 
 		 		(if (< (gera-numero-decimal) temperatura)
+		 			(setf nos-expandidos (1+ nos-expandidos))
 		 			(setf estado-actual proximo-estado)))
 
 	 		(setf custo-actual (custo-estado estado-actual))
 
 			(if (>= (calcula-tempo-execucao) +max-tempo-execucao+)
-				(return-from tempera-simulada melhor-solucao))
-
+				(return-from tempera-simulada (append (list melhor-solucao) (list nos-expandidos) (list nos-gerados))))
+			(setf sucessores NIL)
 	 		(setf i (1+ i))))))
 
 
@@ -628,7 +638,10 @@
 	(let ((solucao NIL)
 		  (tempo 0)
 		  (funcao-heuristica NIL)
-		  (usa-procura? NIL))
+		  (usa-procura? NIL)
+		  (estado-final NIL)
+		  (nos-expandidos)
+		  (nos-gerados))
 		(cond 
 			((equal estrategia "melhor.abordagem")
 				NIl)
@@ -649,7 +662,10 @@
 						  :objectivo? #'objectivo-p
 						  :custo #'custo-estado
 						  :heuristica #'n-turnos))
-				(setf solucao (sondagem-iterativa problema))))
+				(setf solucao (sondagem-iterativa problema))
+				(setf estado-final (car solucao))
+				(nos-expandidos (nth 1 solucao))
+				(nos-gerados (nth 2 solucao))))
 			((equal estrategia "ILDS")
 				(progn 
 					(setf solucao (ilds (le-estado-inicial problema)))))
@@ -661,21 +677,25 @@
 						  :custo #'custo-estado
 						  :heuristica #'n-turnos))
 				(setf solucao (tempera-simulada problema))
-				)))
+				(setf estado-final  (car solucao))
+				(setf nos-expandidos (nth 1 solucao))
+				(setf nos-gerados (nth 2 solucao)))))
 		(when usa-procura?
 			(setf problema (cria-problema (le-estado-inicial problema)
 									  (list #'operador)
 									  :objectivo? #'objectivo-p
 									  :heuristica funcao-heuristica))
 			(setf solucao (procura problema estrategia))
-			;(format t "~A ~%" solucao)
-			(setf solucao (car (last (car solucao)))))
+
+			(setf estado-final (car (last (car solucao))))
+			(setf nos-expandidos (nth 2 solucao))
+			(setf nos-gerados (nth 3 solucao)))
 
 		;;Se tiver sido resolvido usando procura.lisp
 		;;e necessario obter o ultimo elemento do caminho devolvido
-
+		;(format t "~A ~%" solucao)
 		(setf tempo (calcula-tempo-execucao))
-		(cons (cons (cons solucao (custo-estado solucao)) (n-turnos solucao)) tempo)))
+		(append (list estado-final) (list (n-turnos solucao)) (list tempo) (list nos-expandidos) (list nos-gerados))))
 
 		#|	(setf prob1 (cria-problema (le-estado-inicial p1)
 									  (list #'operador)
