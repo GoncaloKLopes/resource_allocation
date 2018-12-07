@@ -4,7 +4,7 @@
 (load "procura")
 (load "turnos-teste")
 
-(defconstant +max-tempo-execucao+ 5)
+(defconstant +max-tempo-execucao+ 270)
 
 (defconstant +duracao-max-turno+ 480)
 (defconstant +duracao-min-turno+ 360)
@@ -695,7 +695,7 @@
 		;;e necessario obter o ultimo elemento do caminho devolvido
 		;(format t "~A ~%" solucao)
 		(setf tempo (calcula-tempo-execucao))
-		(append (list estado-final) (list (n-turnos solucao)) (list tempo) (list nos-expandidos) (list nos-gerados))))
+		(append (list estado-final) (list (custo-estado estado-final)) (list (n-turnos estado-final)) (list tempo) (list nos-expandidos) (list nos-gerados))))
 
 		#|	(setf prob1 (cria-problema (le-estado-inicial p1)
 									  (list #'operador)
