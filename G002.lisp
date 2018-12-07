@@ -542,13 +542,19 @@
       
       (setf custo-actual (custo-estado (car resultado-ilds-aux)))
       
-      (if (< custo-actual custo-melhor)
+      (if (< (length (car resultado-ilds-aux)) (length melhor))
           (progn
             (setf melhor estado-actual)
-            (setf custo-melhor custo-actual)))
+            (setf custo-melhor custo-actual))
+        (if (= (length (car resultado-ilds-aux)) (length melhor))
+            (if (< custo-actual custo-melhor)
+                (progn
+                  (setf melhor estado-actual)
+                  (setf custo-melhor custo-actual)))))
+            
       
       (setf nos-expandidos (+ nos-expandidos (- (length estado) (length (car resultado-ilds-aux)))))
-      (setf nos-gerados (+ nos-gerados (length (cdr resultado-ilds-aux)) 1))))) |# 
+      (setf nos-gerados (+ nos-gerados (length (cdr resultado-ilds-aux)) 1)))))|# 
 
 
 ;;;ilds-primeiro e ultimo sucessor
