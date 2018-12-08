@@ -543,12 +543,12 @@
       
       (if (< (length (car resultado-ilds-aux)) (length melhor))
           (progn
-            (setf melhor estado-actual)
+            (setf melhor (car resultado-ilds-aux))
             (setf custo-melhor custo-actual))
         (if (= (length (car resultado-ilds-aux)) (length melhor))
             (if (< custo-actual custo-melhor)
                 (progn
-                  (setf melhor estado-actual)
+                  (setf melhor (car resultado-ilds-aux))
                   (setf custo-melhor custo-actual)))))
             
       
